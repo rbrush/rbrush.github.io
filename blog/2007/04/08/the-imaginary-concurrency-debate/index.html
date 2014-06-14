@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>The Imaginary Concurrency Debate - Too Much Code</title>
+  <meta name="author" content="Ryan Brush">
+
+  
+  <meta name="description" content="It&#8217;s finally being accepted: the shared memory, critical region model for concurrent programming is broken. Even good programmers slip up and &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/2007/04/08/the-imaginary-concurrency-debate/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Too Much Code" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-2927953-1']);
+    _gaq.push(['_setDomainName','toomuchcode.org']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Too Much Code</a></h1>
+  
+    <h2>Not enough cohesion</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.toomuchcode.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">The Imaginary Concurrency Debate</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-04-08T16:01:32-05:00" pubdate data-updated="true">Apr 8<span>th</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">It&#8217;s finally being accepted: the shared memory, critical region model for concurrent programming is broken.   Even good programmers slip up and introduce race conditions, and bad programmers don&#8217;t even understand the semantics.  (You mean I have to lock an object just to <span style="font-style: italic;">read</span> its values?)<br /><br />The question is: how do we fix it?  Two proposals have drawn attention: The Actor/Message model and Software-Transactional Memory (STM).  The former eliminates shared state entirely, using messaging primitives for communication between threads, which may or may not be in the same process or physical machine.  The latter preserves shared memory, but each thread has a consistent view of shared state during an operation and makes updates atomically, much like a database transaction.  We&#8217;ll refer to these as the <a title="Erlang model" href="http://www-128.ibm.com/developerworks/java/library/j-cb04186.html?ca=drs">Erlang model</a> and the <a title="Haskell model (pdf)" href="http://research.microsoft.com/%7Esimonpj/papers/stm/stm.pdf">Haskell model (pdf)</a>, respectively, referring to the programming languages that most visibly use these synchronization techniques.<br /><br />A debate between these models has quietly arisen.  Proponents of the shared-nothing model point out the scalability and simplicity of Erlang.  Proponents of STM point out the composability of guaranteeing updates to two components can be made atomically.  Incredibly, it seems like this entire debate is ill-formed, and can be resolved with some simple generalization.<br /><br />First we realize nearly all non-trivial applications use both a form of messaging and shared resources.  A simple web application accepts messages from clients and shares state in a database.  Therefore, any widely used programming environment must offer first-class support for transacted resources <span style="font-style: italic;">and</span> messaging.<br /><br />Now, suppose we view transacted memory simply as a hidden optimization of a transacted resource.  In Erlang I can send messages to an Erlang process in the same physical address space or on a different machine &#8211; the former is simply a runtime optimization and not the concern of the developer.  STM is just a local optimization of a transacted resource; with abstraction we can also host the resource remotely like a database or distributed cache.<br /><br />In fact, the Erlang and Haskell models are closer than they first appear.  The STM proposal for Haskell has almost nothing to suggest a TVar must be locally hosted.  There are Erlang libraries allowing use of an RDBMS.   Both of these could be implementations of a general &#8220;transacted resource&#8221; API or Monad.  Similar parallels can be made for the messaging model.  Of course the languages have other significant differences, but these concepts are not so far apart.<br /><br />So where does this leave us in the concurrency debate?  I think we can draw some conclusions:<br /><ul><li>Today&#8217;s concurrency primitives can be abandoned, replaced by messaging and transacted resources</li><li>Messaging and shared resources are complementary constructs used in most applications</li><li>Shared memory is to transacted resources what in-process messaging is to general messaging: a hidden optimization</li><li>Applications should use messages, transactions, or an appropriate combination depending on their needs<br /> </li></ul>  Now we need to ask why no widespread language has yet to replace critical region primitives with messaging and transacted memory.  I think this is largely because such languages are hard to design.  Notice how I&#8217;m generalizing STM and transacted databases to the same concept, but they have very different usage patterns in practice.  It will be a challenge to design something this general yet simple enough so people will actually want to use it.  But I&#8217;m an optimist.<br /><br />One final note: both of these models are more easily implemented using a functional programming style.  Something as simple as immutable objects makes both local messaging and transactions much simpler and more efficient.  It&#8217;s funny how good practices pay off in ways we don&#8217;t expect.</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Ryan Brush</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-04-08T16:01:32-05:00" class="updated">Updated Apr 8<span>th</span>, 2007</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2007/04/08/the-imaginary-concurrency-debate/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2007/04/08/the-imaginary-concurrency-debate/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2007/02/26/imperfect-approximation-of-perfect-code/" title="Previous Post: Imperfect Approximation of Perfect Code">&laquo; Imperfect Approximation of Perfect Code</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2007/06/02/why-java-lost-its-mojo%2C-and-what-sun-is-doing-about-it/" title="Next Post: Why Java lost its mojo, and what Sun is doing about it">Why Java lost its mojo, and what Sun is doing about it &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/17/clara-0-dot-5-released/">Clara 0.5 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/06/clara-0-dot-4-released/">Clara 0.4 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/19/rules-as-data/">Rules as Data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/">Crossing the (Data) Streams&#58; Scalable Realtime Processing With Rules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/24/rules-as-a-control-structure/">Rules as a Control Structure</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/rbrush">@rbrush</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'rbrush',
+            count: 4,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<section><h1>Twitter</h1>
+<a class="twitter-timeline" href="https://twitter.com/ryanbrush" data-widget-id="477774048554795009">Tweets by @ryanbrush</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ryan Brush -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Start by embracing your limits - Too Much Code</title>
+  <meta name="author" content="Ryan Brush">
+
+  
+  <meta name="description" content="Nothing in human history has offered more promise but has seen as many failures as software. We’ve all seen moments of greatness, where a program &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/2010/11/27/start-by-embracing-your-limits/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Too Much Code" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-2927953-1']);
+    _gaq.push(['_setDomainName','toomuchcode.org']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Too Much Code</a></h1>
+  
+    <h2>Not enough cohesion</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.toomuchcode.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Start by Embracing Your Limits</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2010-11-27T11:37:30-06:00" pubdate data-updated="true">Nov 27<span>th</span>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><div style="margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; background-color: transparent; font-family: Times; font-size: medium; "><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Nothing in human history has offered more promise but has seen as many failures as software.  We’ve all seen moments of greatness, where a program seems like magic &#8211; but such gems are surrounded by minefields of bugs and indecipherable interfaces.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">The result of all this is we programmers are often a frustrated bunch. But should we be? After all, what makes us think that as a species we should have the aptitude to create great software?  Our skill sets evolved in an environment that favored those who could hunt boar and find berries &#8211; any capacity to succeed in the abstract world of software is pure, accidental side effect.  Perhaps we should be awed by software’s successes rather than frustrated by its failures.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">The good news is we can improve despite our limitations, and it starts with this: accept that we generally have no innate ability to create great systems, and design our practices around that.  It seems like </span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">every</span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "> major step forward in software has followed this pattern of embracing our limitations.  For instance, we move to iterative development since we can’t anticipate all variables of a project.  We aggressively unit test because we realize we’re prone to error. Libraries derived from practical experience frequently replace those built by expert groups.   The list goes on.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">This type of admission is humbling, but it can also be liberating.  Here’s an example: In years past I would spend hours agonizing over an internal design decision for a system I was building.  I figured if I got it right we could easily bolt on some new feature.  Sometimes I was right, but often times I was not.  My code often was littered with unnecessary structure that only made things more complicated.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Contrast that to today:  I know I can’t anticipate future needs in most cases, so I just apply this simple heuristic: </span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><ol><li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; "><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">When in doubt, do the simplest thing possible to solve the problem at hand</span></li><li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; "><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Plan on refactoring later.</span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "> </span></li></ol><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">The first step frees us from trying to anticipate all future needs &#8211; but this is not quick and dirty cowboy coding.  An essential element of code is to create an understandable and maintainable system.  Don&#8217;t try to code for future needs.  Instead, structure code for present needs so it can be leveraged in the future.  </span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">So how do we do this? A couple things to keep in mind:</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><ul><li style="list-style-type: disc; font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; "><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">When in doubt, leave it out. (also known as “You Ain’t Gonna Need It”)</span></li><li style="list-style-type: disc; font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; "><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Unit-Testable designs tend to be reusable designs.  Unit tests not only catch bugs that can result from refactoring, but they encourage modularity to enable that refactoring.</span></li><li style="list-style-type: disc; font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; "><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Don’t try to design an API independently of an application.  You won’t understand your users’ needs well enough to create a good experience.   Build the API as part of the application to make sure its needs are met, then factor out and generalize.</span></li><li style="list-style-type: disc; font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; "><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Group code together that tends to change for similar reasons.  If your Widget class is responsible for rendering its UI </span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">and</span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "> writing to the database </span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">and</span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "> business logic, you can’t use it anywhere else without significant changes.  High cohesion and loose coupling.</span></li></ul><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">There are no hard-and-fast rules to building software, but we all need a compass to help guide us through the thousands of micro-decisions we make every time we write code.  Hopefully this post can help build that compass.</span></div></div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Ryan Brush</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2010-11-27T11:37:30-06:00" class="updated">Updated Nov 27<span>th</span>, 2010</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2010/11/27/start-by-embracing-your-limits/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2010/11/27/start-by-embracing-your-limits/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2010/10/18/can-agile-in-the-large-succeed/" title="Previous Post: Can "Agile in the Large" Succeed?">&laquo; Can "Agile in the Large" Succeed?</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2013/08/18/a-long-time-ago-we-used-to-be-friends/" title="Next Post: A long time ago, we used to be friends">A long time ago, we used to be friends &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/17/clara-0-dot-5-released/">Clara 0.5 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/06/clara-0-dot-4-released/">Clara 0.4 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/19/rules-as-data/">Rules as Data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/">Crossing the (Data) Streams&#58; Scalable Realtime Processing With Rules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/24/rules-as-a-control-structure/">Rules as a Control Structure</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/rbrush">@rbrush</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'rbrush',
+            count: 4,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<section><h1>Twitter</h1>
+<a class="twitter-timeline" href="https://twitter.com/ryanbrush" data-widget-id="477774048554795009">Tweets by @ryanbrush</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ryan Brush -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>End of software's dark age? - Too Much Code</title>
+  <meta name="author" content="Ryan Brush">
+
+  
+  <meta name="description" content="Software has held more promise and yet met with more failure than any other technology. Meanwhile the hardware guys have been merrily creating more &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/2008/01/06/end-of-softwares-dark-age/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Too Much Code" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-2927953-1']);
+    _gaq.push(['_setDomainName','toomuchcode.org']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Too Much Code</a></h1>
+  
+    <h2>Not enough cohesion</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.toomuchcode.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">End of Software's Dark Age?</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2008-01-06T21:51:50-06:00" pubdate data-updated="true">Jan 6<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">Software has held more promise and yet met with more failure than any other technology.  Meanwhile the hardware guys have been merrily creating more and more CPU cycles for us to swamp.<br /><br />A lot has been written about why software sucks.  <span style="font-style: italic;"> </span>Fred Brooks famously predicted there would be <a title="no silver-bullet" href="http://inst.eecs.berkeley.edu/%7Emaratb/readings/NoSilverBullet.html">no silver bullet</a>   improvement in software productive over the next ten years.  That was twenty years ago, but there are signs that the dark age of software might be slowly and quietly coming to an end.<br /><br />Brooks was right about the lack of a silver bullet, of course.  But since then we&#8217;ve learned that we&#8217;ve been trying to kill the wrong monster.  Building a program was compared to the reliable timeline and quality of building a bridge or skyscraper, and we were mystified on how to get there.  This is the wrong monster; instead we need to view code as design and adopt our practices to match.  Coding is a creative process with much more in common with design than with any industrial process &#8211; <a href="http://www.developerdotstar.com/mag/articles/reeves_design_main.html" title="Jack Reeves got it right">Jack Reeves got it right</a>.<br /><br />Notice successful development methodologies jibe with viewing code as design.  We unit test because a design isn&#8217;t complete until validated with a simulation.  We work in iterations because a change in one part of the design affects others.  We document in the source code itself because that is the definitive source of design.<br /><br />The code-is-design perspective also predicts many supposed mysteries: huge productivity variance, a high number of defects, and failures of rote process are all expected in unvalidated, untested design.<br /><br /><span style="font-weight: bold;">Mysteries and Problems</span><br />Fortunately we&#8217;ve taken an important step: software development was once a mystery in search of a silver bullet; now it is a problem with real progress.  Noam Chomsky pointed out the first step to understanding the natural world is to turn mysteries into problems.  We&#8217;re seeing the same with software engineering.<br /><br />Given the premise of code being design, here are some steps to take us in the right direction:<br /><br />1. Boil out the remaining accidents.  We can still have race conditions or leak resources in many programming languages.  Newer languages should make these mistakes impossible.  We can also learn from existing languages.  For instance, the messaging model in Erlang prevents many types of timing problems.   Functional languages may eliminate the many types of bugs which arise from side effects.  The essence of a design should not be concerned with timing or unexpected side effects, so whenever possible this should be solved in the language itself.<br /><br />2. Make validation of designs easy.  How about the following requirement for a new programming language:   <br /><br />   <span>It must be straightforward to write a unit test to reproduce any possible bug.</span><br /><br />Since designs must be validated with computer simulation, we must make those simulations easy.  Huge strides have been made with various unit testing frameworks, but there are still shortcomings.  Proofs of correctness are impractical for most systems, but the ability to easily assert a system doesn&#8217;t have a particular bug is the next best thing.  Furthermore, any bug discovered at any time should be added to the test suite to make sure it never occurs again.  This ensures the defect rate of a system trends towards zero.<br /><br />3.  Design and code should merge into a single artifact.  We still need design at a higher level than current programming languages, but this design needs to be an asset rather than a burden that gets out of synch with the code.<br /><br />We are already seeing this: documentation has been merged with source code and tools convert code to UML diagrams and vice versa.  But there is a lot of room for improvement.  Code in object-oriented languages often includes many unessential objects that are just noise from a high-level view.  These should be eliminated from the language, or at least filtered from the high-level design.<br /><br />There are surely many other examples that I&#8217;m overlooking, and functional languages do hold promise.  What&#8217;s important is we now have an idea of why software sucks, and an inkling of what the solution might be.</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Ryan Brush</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2008-01-06T21:51:50-06:00" class="updated">Updated Jan 6<span>th</span>, 2008</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2008/01/06/end-of-softwares-dark-age/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2008/01/06/end-of-softwares-dark-age/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2007/12/26/what-we-can-learn-from-databases/" title="Previous Post: What we can learn from databases">&laquo; What we can learn from databases</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2008/03/09/tearing-down-the-software-factory/" title="Next Post: Tearing Down the Software Factory">Tearing Down the Software Factory &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/17/clara-0-dot-5-released/">Clara 0.5 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/06/clara-0-dot-4-released/">Clara 0.4 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/19/rules-as-data/">Rules as Data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/">Crossing the (Data) Streams&#58; Scalable Realtime Processing With Rules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/24/rules-as-a-control-structure/">Rules as a Control Structure</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/rbrush">@rbrush</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'rbrush',
+            count: 4,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<section><h1>Twitter</h1>
+<a class="twitter-timeline" href="https://twitter.com/ryanbrush" data-widget-id="477774048554795009">Tweets by @ryanbrush</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ryan Brush -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

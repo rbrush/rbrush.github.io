@@ -1,0 +1,424 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Too Much Code</title>
+  <meta name="author" content="Ryan Brush">
+
+  
+  <meta name="description" content="Technologies get adopted when there is a compelling reason. People bought PCs for the killer app; game consoles sold for the killer game. Programming &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/page/3/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Too Much Code" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-2927953-1']);
+    _gaq.push(['_setDomainName','toomuchcode.org']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Too Much Code</a></h1>
+  
+    <h2>Not enough cohesion</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.toomuchcode.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2007/02/08/part-4-the-killer-app/">Part 4&#58; the Killer App</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-02-08T20:05:02-06:00" pubdate data-updated="true">Feb 8<span>th</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">Technologies get adopted when there is a compelling reason.  People bought PCs for the killer app; game consoles sold for the killer game.  Programming languages take off because they have a killer feature.  Philip <span class="misspell" suggestions="Waddle,Wader,Adler,Waller,Wailer">Wadler</span> <a title="pointed this out" href="http://citeseer.ist.psu.edu/wadler98why.html">pointed this out</a> nine years ago:<br /><blockquote>Instead, experience shows that users will be drawn to a language if it lets them conveniently do something that otherwise is difficult to achieve. Like other new technologies, functional languages must seek their killer app.</blockquote>Java was adopted largely because it was easy for C++ developers to pick up, and offered killer features like cross-platform development and garbage collection.  So what is the killer feature of the next language?  I&#8217;ll take a shot: the complete and final eradication of undefined behavior.<br /><br /><span style="font-weight: bold;">No Behavior Left Undefined</span><br />&#8220;Undefined behavior&#8221; is the biggest euphemism in software engineering.  It even beats out &#8220;non-trivial problem&#8221;.  It&#8217;s why your code works great on your laptop, but every one of your users runs a <a title="DeathStation 9000" href="http://en.wikipedia.org/wiki/DeathStation_9000"><span id="bad_word" class="misspell" suggestions="Death Station,Death-Station,Detestation,Devastation,Dissertation">DeathStation</span> 9000</a>.  Amazingly, most mainstream languages still have areas where behavior is undefined and unpredictable.<br /><br />Fortunately, modern languages have made great strides as compared to, say, C++.  However, we still have a long way to go.  The big problem these days is race conditions caused by improperly synchronized code.  And it looks like concurrent programming will only become more common. <br /><br />What makes undefined behavior particularly evil is not that it might fail; it&#8217;s that it might succeed.  We <span style="font-style: italic;">want</span> incorrect code to consistently fail.  This way every time we find a bug we can isolate it with a unit test and ensure it never happens again.  But undefined behavior shoots a hole in this: we can have incorrect code that <span style="font-style: italic;">passes every possible unit test.</span>  The result is bugs showing up in the worst possible place, production.<br /><br />Consider the practical implications of working in a language without undefined behavior.  If we can create a reliable unit test for any bug we find, we can guarantee that bug never recurs.  Good development practices can cause defect counts to trend towards zero.  It also makes development itself easier by strengthening our <a title="firewall against complexity" href="http://toomuchcode.blogspot.com/2007/02/building-firewall-against-complexity.html">firewall against complexity</a>.  Although we&#8217;ll never eliminate buggy code, hopefully we can create enough stability to prevent bugs from spiraling out of control, which has led to the death of many projects.<br /><span style="font-weight: bold;"><br /><span style="font-weight: bold;">Where is our new language?</span></span><br />The <a title="first" href="http://toomuchcode.blogspot.com/2007/02/part-1-programming-and-metaphorical.html">first</a> <a title="three" href="http://toomuchcode.blogspot.com/2007/02/part-2-languages-and-lesser-skilled.html">three</a> <a title="posts" href="http://toomuchcode.blogspot.com/2007/02/building-firewall-against-complexity.html">posts</a> and this one describe an ideal for a new programming language.  Many details were intentionally left out to focus on the essence, so many language styles might work.  Now I have a question for you: what current or upcoming language best meets these ideals?  Much of this exists in part in Haskell, Erlang, Ruby, <span class="misspell" suggestions="Scalar,Scale,Scaly,Scald,Scalp">Scala</span>, F# or others, but I know of no language meeting them all.  I hope that will change soon.    <span style="font-weight: bold;"><span style="font-weight: bold;"></span><br /></span><br />Thanks to everyone who made it through these posts.  I do want to hear your thoughts.</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2007/02/08/part-3-building-a-firewall-against-complexity/">Part 3&#58; Building a Firewall Against Complexity</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-02-08T20:04:05-06:00" pubdate data-updated="true">Feb 8<span>th</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">In the <a title="first" href="http://toomuchcode.blogspot.com/2007/02/part-1-programming-and-metaphorical.html">first</a> <a title="two" href="http://toomuchcode.blogspot.com/2007/02/part-2-languages-and-lesser-skilled.html">two</a> posts in this sequence, I argued a few key points:<br /><ul><li> A language must be usable by mediocre developers to achieve widespread use.</li><li> A language that prevents quick and dirty application development will not be widely adopted.</li><li>Widespread adoption is important so good programmers can use better languages in their day jobs.</li><li>Haskell shows important innovation in language design, but has major hurdles to widespread adoption.<br /></li></ul>Assuming the above, we have a big problem: how do we make the essential innovation in Haskell available to the broader industry?  We need to first define the essence of Haskell&#8217;s contribution, and then look for ways to package that essence for widespread use.<br /><br />I will use a simple model of software problems to define Haskell&#8217;s essential contribution.  Complexity kills, but Haskell helps contain it<span style="font-style: italic;">.</span>  We were in trouble the moment systems got too big for a single human to understand, and we kept digging the hole deeper.  This needs to stop.<br /><br />So far the best answer to complexity has been good design abstraction.  And there have been successes &#8211; I usually don&#8217;t think about the virtual memory system when writing code, for instance.  But as Joel Spolsky pointed out, &#8221;<a title="All non-trivial abstractions, to some degree, are leaky." href="http://www.joelonsoftware.com/articles/LeakyAbstractions.html">All non-trivial abstractions, to some degree, are leaky</a>.&#8221;  I don&#8217;t <span style="font-style: italic;">usually</span> think about virtual memory, but if I have locality of reference problems and huge numbers of page faults, the abstraction leaks.   Suddenly I have to think about everything my program does, everything its libraries do, all existing abstraction leaks, <span style="font-style: italic;">and</span> the virtual memory system.  Soon there isn&#8217;t room in my limited mind to keep track of everything.  The result is almost inevitable: a system gets more complex, details are missed, and defects creep in.<br /><br />To make matters worse, the difficulty of understanding a system grows exponentially with size.  Every variable added must be tracked with every other variable.  I see two possible solutions to this:<br /><ol><li>Stop building such complex software.</li><li>Find ways to build airtight firewalls around complexity.  Stop the leaks.<br /></li></ol>History suggests option one is not likely.  Great programmers can solve complex problems with simple code, but this is not the broader trend.  Even if it was, this answer is unsatisfying; it&#8217;s really just avoiding the problem.<br /><br />The second solution might have potential.  Imagine if we had abstractions that didn&#8217;t leak, even if they could only be used in special conditions, or applied to certain problems.  There will always be complexity, but by bounding it with airtight abstractions we limit the number of variables involved.  Heck, if we do a great job, it&#8217;s possible even we humans will be able to understand the systems we build.<br /><br />This is where we reach the essential contribution of Haskell (or any pure functional language): <span style="font-style: italic;">it builds a firewall around the rest of the system&#8217;s complexity.</span>  You only have to think about the part you&#8217;re working, and you can make that small enough to be understandable.   Because functions can&#8217;t have side effects, you don&#8217;t have to worry about locking a resource or dealing with inconsistent state.  Your universe is defined by a function&#8217;s arguments.<br /><br />So far, so good&#8230;but we still need to package our firewall against complexity to be more easily adopted and used.  Notice large parts of functional languages are not included in the essential contribution.  For instance, a chunk of code could be written in any style, as long as its side effects are encapsulated.  Here we break away from the pure functional model.  If local destructive updates, statements, for loops, or other imperative constructs make coding easier, we can allow them.  The key is not allowing these local decisions escape; our firewall against complexity must hold.  A similar point came up in a recent <a title="discussion on Channel 9" href="http://channel9.msdn.com/Showpost.aspx?postid=273697">discussion on Channel 9</a>.  Erik Meijer described it as &#8220;local impurity, but global purity&#8221;.<br /><br />This is a key element for our hypothetical new language: allow developers to code in their style of choice, provided it does not compromise the system&#8217;s guarantees.  The merits of different styles are open to debate, but surely no one style is the best for all programs.  Ultimately, our hypothetical language might really be a set of languages, all keeping the same guarantee of isolation.  The key is we can build a language with stronger guarantees than any commonly used language, but make it easy for most developers to adopt.<br /><br /><span style="font-weight: bold;">Can we live without state?</span><br />System state is the biggest source of complexity for imperative programs.  It&#8217;s also the biggest reason imperative code is considered easier for quick and dirty solutions.  You want to change state?  Go for it.  Just be sure you synchronize with other threads, and your state change is consistent with the rest of the system, and you leave the system in a consistent state in case of error, and&#8230;well, hope others changing the state follow the same rules.     <br /><br />All of these problems go away with functional languages.  But I can&#8217;t shake the idea that a language restricting all access to state simply won&#8217;t get adopted.  Haskell elegantly solves this solution with the Monad; you write code in isolation, and simply describe the side effects to be evaluated as needed.  Sounds good, until you run into problems like the one described <a title="here" href="http://kawagner.blogspot.com/2006/12/my-haskell-experience.html">here</a>.  In that case, the developer discovered a deep function needed some additional piece of information, and had to refactor large amounts of code to get it there.  This drawback may well be justified by the advantages of isolated coding.  Then again, our goal is to get a better language adopted, and most businesses will reject one that makes writing quick and dirty code harder, even if there is a net gain.<br /><br />I really hope I&#8217;m wrong about this one.  (And I&#8217;m sure many will try to convince me that I am.)   I suspect, though, that languages must make accessing state information easy to gain widespread adoption.  Is there a way we can do this while holding on to our firewall against complexity?  Maybe.  There are some tempting ideas that might solve this.  Possibilities include <a title="Software Transactional Memory" href="http://en.wikipedia.org/wiki/Software_transactional_memory">Software Transactional Memory</a> (STM), or messaging-based models like Erlang.  The answer to which is better must come from experimentation, although STM elegantly solves some problems others do not, as <a title="Tim Sweeny described (pdf)." href="http://morpheus.cs.ucdavis.edu/papers/sweeny.pdf">Tim Sweeny described (pdf).</a>   Assuming an adopted system must be able to easily change state, we can still use STM to attain many advantages of the functional style:<br /><ul><li>No race conditions or deadlock.  STM can make code seem like it&#8217;s running in a single-threaded environment.  This is our firewall against concurrency complexity.</li><li> No inconsistent state.  If any error occurs, the transaction is simply rolled back.  As a result, the state space of the system is dramatically reduced, and all possible states are logically consistent.</li><li>External side effects (like database updates) should happen in the same transaction as memory updates, again ensuring consistent state.<br /></li></ul>A new language could allow only special annotated functions to use STM, clearly indicating which functions are logically pure.  This is analogous to implicitly passing a Haskell Monad to every pertinent function.  Yes, we are sacrificing functional purity.   However, we keep our firewall, and build a language that just might find a widespread audience.  Also, we need not sacrifice other great features of functional languages to get there.  For instance, a function may do destructive updates internally but always return an immutable object, lending itself to memoization.<br /><br />In summary, we have two new requirements for our hypothetical language:<br /><span style="font-style: italic;"><blockquote>Developers should be able to choose their style of programming, but still have strong guarantees of isolation from the rest of the system.</blockquote><span style="font-style: italic;"></span></span><blockquote><span style="font-style: italic;"><span style="font-style: italic;">The system should limit the number of variables the developer must track while writing code.</span><br /></span></blockquote>In my next post, I will add more requirements in this spirit, and hopefully draw these thoughts to a close.</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2007/02/07/part-2-languages-and-the-lesser-skilled-developer/">Part 2&#58; Languages and the Lesser-Skilled Developer</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-02-07T01:18:14-06:00" pubdate data-updated="true">Feb 7<span>th</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">My <a title="last post" href="http://toomuchcode.blogspot.com/2007/02/part-1-programming-and-metaphorical.html">last post</a> ended with an assertion: we need a language with the best of Haskell in a more accessible form.  This leads to an old debate.  After all, building good software requires tremendous skill.  How can we make progress if we tailor it to the weakest practitioners?  Bjarne Stroustrup <a href="http://www.technologyreview.com/Infotech/17868/page1/" title="made this point well">made this point well</a>:<br /><blockquote> The idea of programming as a semiskilled task, practiced by people with a few months&#8217; training, is dangerous. We wouldn&#8217;t tolerate plumbers or accountants that poorly educated. We don&#8217;t have as an aim that architecture (of buildings) and engineering (of bridges and trains) should become more accessible to people with progressively less training. Indeed, one serious problem is that currently, too <i>many</i> software developers are undereducated and undertrained.</blockquote>Stroupstrup is right, of course.  Too many developers <span style="font-style: italic;">are</span> undereducated; we <span style="font-style: italic;">should</span> demand greater skill.   However, this doesn&#8217;t change the fact that language adoption for a given shop has as much to do with politics as technical merit.  Businesses have a perceived need to hire armies of developers to quickly write bad code and bad software.  We&#8217;ll be asking &#8221;<a title="WTF" href="http://thedailywtf.com/">WTF</a>?&#8221; for a long time to come.<br /><br />The problem is highly skilled developers are often forced to use the languages accessible to their less competent colleagues.  Browse the forums at <a title="Reddit" href="http://reddit.com/">Reddit</a> and you&#8217;ll find lots of developers coding C# or Java by day and Haskell or Lisp by night.  In short, a language must be usable by lesser-skilled developers so high-skilled developers have more opportunities to use it.   Ruby is a great example of this in action &#8211; building a quick and dirty web application is trivial, but the language still offers powerful constructs such as closures.<br /><br /><span style="font-weight: bold;">Battling the Hack</span><br /><span style="font-weight: bold;"></span>Anyone who has written software for a couple years has come across the Nasty Hack &#8211; what should have been a simple piece of code made horribly complex, requiring an alignment of planets to work.  Languages such as Haskell have the laudable goal of <a title="preventing nasty hacks" href="http://neilbartlett.name/blog/?p=11">preventing nasty hacks</a> by <a title="restricting what can be done in a given context" href="http://syntaxfree.wordpress.com/2007/01/08/haskell-bondage-and-discipline-and-separation-of-concerns-programming/">restricting what can be done in a given context</a>.  Sadly, good design often takes second place to deadlines &#8211; and a language that has the appearance of slowing development won&#8217;t get far, even if it offers a net gain.<br /><br />Even a language that prevents some classes of nasty hacks will <a title="allow other kinds" href="http://trevion.blogspot.com/2006/11/functional-anti-patterns.html">allow others</a>.  No language will free us from bad code altogether.  Even worse, languages that free us from large classes of bad code have trouble getting adopted because businesses indirectly want to hack.  This has depressing implications:  the nasty hack is here to stay, and languages attempting to eliminate it will struggle to find widespread adoption.  Our only hope is a fundamental cultural change in the way most organizations build software.<br /><br />There is nothing I want to see more than this cultural shift.  Maybe some day the market will get so sick of bad software it will force change.  Consumers might realize great software<span style="font-style: italic;"> is </span>possible, as shown by a few innovative companies.   Other companies might finally delay entry to a market, knowing a buggy solution will be rejected.   The lesser-skilled developer might be forced to improve or leave the field.<br /><br />However, while attempting to change the culture we still need to innovate under the current constraints.  This means it must be easy to write quick and dirty code in a widely adopted language.  So I submit a requirement for our new language:<br /><span style="font-style: italic;"><blockquote>A language should encourage good code &#8211; but make quick and dirty code possible.</blockquote></span>Today languages like Ruby and Python are probably the closest to the mark.  Inexperienced developers can quickly get code working, and more advanced developers have access to powerful features drawn from the functional world.  However, both of these languages have shortcomings when compared to Haskell.  Incorrect code can lead to unpredictable behavior, and poorly designed code can lead to a state space too big for any human to understand.  Specifically, they do not offer a tractable solution to <a title="concurrency and composability" href="http://research.microsoft.com/%7Esimonpj/papers/stm/stm.pdf">concurrency and composability</a> (pdf).<br /><br />In my next post I will attempt to outline a language concept drawing from the best of Ruby, Haskell, and other sources.<br /><br />(Edit: fix typo)
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2007/02/03/part-1-programming-and-the-metaphorical-mind/">Part 1&#58; Programming and the Metaphorical Mind</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-02-03T15:17:57-06:00" pubdate data-updated="true">Feb 3<span>rd</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><span style="font-weight: bold;">Hello, World</span><br />This is the first of a set of posts on what we need from a new programming language.  Everything I discuss exists in some language &#8211; at least in part &#8211; but no language yet has them all.  This content is a mixture of my experience and many borrowed ideas, which I will do my best to cite.  My goal is to represent the language needs of some segment of developers.<br /><br /><span style="font-weight: bold;">The Metaphorical Mind</span><br />I&#8217;ll start simply: a language must be designed and taught with its users in mind.  There is a psychology to programming which may explain why some languages get adopted and better ones don&#8217;t.  To model this psychology, I borrow the idea of the &#8220;Metaphorical Mind&#8221;<span style="font-style: italic;"><span style="font-style: italic;">,</span></span> as described in Steven Pinker&#8217;s excellent <a title="How the Mind Works" href="http://pinker.wjh.harvard.edu/books/htmw/index.html">How the Mind Works</a>.   In Pinker&#8217;s words, &#8220;The human mind, we see, is not equipped with an evolutionarily frivolous faculty for doing Western science, mathematics, chess, or other diversions.&#8221;  Our minds evolved to work with the physical world, and we reason with abstract ideas using physical metaphors.  Pinker cites Ray Jackendoff for examples:<br /><br />The messenger <span style="font-style: italic;">went from</span> Paris <span style="font-style: italic;">to</span> Istanbul.<br />The inheritance finally <span style="font-style: italic;">went to </span>Fred.<br />The light <span style="font-style: italic;">went from</span> green <span style="font-style: italic;">to</span> red.<br />The meeting <span style="font-style: italic;">went from</span> 3:00 <span style="font-style: italic;">to</span> 4:00.<br /><br />(emphasis in original)<br /><br />The first sentence shows physical movement; the others use the same terms but have nothing moving.  Beyond movement, spatial metaphors permeate our thoughts and language.  &#8220;The meeting is <span style="font-style: italic;">at</span> 3:00&#8221;, for instance.  In fact, it&#8217;s hard to describe almost anything without physical metaphors.<br /><br />Many examples exist in software.  Imperative programmers deal with <span style="font-style: italic;">pointers, objects, stacks, messages, events</span> and so on.  Our secondary storage uses <span style="font-style: italic;">folders, files</span> and <span style="font-style: italic;">paths.</span><br /><br />In fact, there is an alarming predictability on language adoption: languages that strengthen the physical metaphor &#8211; or at least solve problems without weakening it &#8211; have found widespread use.  Languages with weaker physical metaphors remain with a small base.  Compare the adoption rates of object-oriented languages to their functional counterparts.<br /><br />This might be an indictment of functional languages, since they are typical expressed in abstract mathematics rather than physical analogs.  That is unfair.  Functional languages can be built and explained in straightforward physical terms &#8211; they just aren&#8217;t.  Take, for instance, Haskell&#8217;s Monad.  I&#8217;ve written only small programs in Haskell, but for my purposes it&#8217;s much easier to think of a Monad as a &#8220;to-do list&#8221;.  (Some use the term &#8220;action&#8221;.  I know it&#8217;s an over-simplification, but that&#8217;s the point.)  The bulk of the language is a means to construct to-do lists in isolation.  Put in these terms, Haskell can be simpler than many languages &#8211; the functional purity eliminates all kinds of moving parts imperative programmers have to worry about.<br /><br />This is a good step, but widespread adoption means more than renaming of concepts.  Unfortunately, programmers who find and learn functional languages are not representative of the population.  I&#8217;m afraid we would lose a broader audience in the first hour of learning Haskell, as soon as they got to this:<br /><br /><code>fibs = 1: 1: zipWith (+) fibs (tail fibs)</code><br /><br />Beautiful, isn&#8217;t it?  One line of code for Fibonacci numbers, what amounts to built-in memoization, the ability to get and manipulate any sequence, and so on.  But it also has only the weakest of ties to a physical analog.  Non-trivial examples are much harder to understand.  Sadly, an incredibly powerful tool for some is simply too abstract for others to use effectively.<br /><br />Because of this and other examples, I doubt Haskell will ever be widely used despite all of its advantages.  But this is okay &#8211; we need powerful tools for the hands of experts.  What I want to see is a more accessible language borrowing the best ideas from Haskell and others.  I wish I could use Monads every day, and am willing to sacrifice some of Haskell&#8217;s other power to achieve this.<br /><br />This raises an important question: shouldn&#8217;t we raise our expectations of developers rather than take away powerful features?  A valid point, which I will tackle this in my next post.<span style="font-style: italic;"></span>  For now, the central thesis of these posts should start to emerge: we need a language with the best parts of Haskell and others in a more accessible form.</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2006/12/26/the-software-engineers-new-clothes/">The Software Engineer&#8217;s New Clothes</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2006-12-26T17:17:38-06:00" pubdate data-updated="true">Dec 26<span>th</span>, 2006</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">The problem with experts is they&#8217;re too smart.  The problem with the rest of us is we don&#8217;t have the expertise to reign in the experts.<br /><br />Consider the following conversation:<br /><br /><span style="font-weight: bold;">Mortal Developer:</span> This system seems complicated.  Can we do without the WhackAMole feature?<br /><span style="font-weight: bold;">Expert: </span>No, some clients might need WhackAMole to interact with their legacy abacus.<br /><br />Now our poor mortal developer is stumped.  After all, this is the <span style="font-style: italic;">expert</span> we&#8217;re talking to here &#8211; and if he says we need WhackAMole you better get whacking.<br /><br />What our developer missed is this: <span style="font-style: italic;">complexity alone is enough to reject a design.</span>  After all, you&#8217;re a smart engineer with years of programming experience.  Even if you&#8217;re not an expert, if a system is hard for you to comprehend, it&#8217;s probably too complicated.  Sadly, there seems to be an &#8220;Emperor&#8217;s New Clothes&#8221; phenomenon in software  &#8211; no one wants to admit something is hard to understand.<br /><br />This shouldn&#8217;t be surprising &#8211; objecting to complexity might be viewed as looking stupid in an industry where intelligence is the highest virtue.  Unfortunately this can do a lot of harm.  Imagine if the J2EE specification had involved a developer without expertise, but with veto power.  Surely the result would have been a lot simpler.  This lesson may have been learned for newer versions, but once added this complexity cannot be completely removed.<br /><br />For anyone that might be struggling with this right now, some humble advice:<br /><ul><li>Follow Alan Kay&#8217;s axiom: &#8220;Simple things should be simple, complex things should be possible.&#8221; &#8211; If something complicated <span style="font-style: italic;">must </span>be in the system, it still should not affect the simple things.</li></ul><ul><li>View the project as a constant battle against complexity &#8211; A single complex module may seem unimportant, but it quickly compounds.</li></ul><ul><li>Understand a project end-to-end &#8211; the project should be easily broken down into problems that are known to be solvable.  (Avoid Southpark&#8217;s 1. Collect Underpants. 2. ??? 3. Profit!!!).   </li></ul><ul>   <li>       A strong-willed engineer or executive can will a group down the wrong path &#8211; it&#8217;s an engineer&#8217;s duty to object and prevent spiraling complexity</li></ul><ul><li>The clever hack should be a last resort &#8211; a hack that is hard to come up with is much harder to debug or support<br /></li></ul>All of this boils down to Keep It Simple, Stupid.  It turns out keeping things simple is pretty hard.<br /><br />Update: This isn&#8217;t to suggest that all experts fall into this trap, but there is certainly evidence suggesting that <span style="font-style: italic;">some</span> do.</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2006/11/14/the-real-reason-we-need-strongly-typed-languages/">The Real Reason We Need Strongly-typed Languages</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2006-11-14T23:07:03-06:00" pubdate data-updated="true">Nov 14<span>th</span>, 2006</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">There aren&#8217;t many hard-and-fast facts about software, but here&#8217;s one:<br /><br />    The more code you have, the more bugs you have.<br /><br />More formally, lines of code is a strong predictor of defects.  So, any language that allows you to do the same work with less code must be a Good Thing.  This is why Python is better than Java is better than C++ is better than assembly, right?<br /><br />Well, almost.  The standard counter argument is strongly-typed languages catch mistakes at compile time that slip to run time for dynamic languages.   I don&#8217;t buy this argument, because  even though it will catch <span style="font-style: italic;">some</span> mistakes, there are so many other errors to be made you still need to unit test the code.  And good unit tests will catch the same errors of strongly-typed languages.  Okay, so a lot of people don&#8217;t write good unit tests, but until they do they&#8217;re beyond our help anyway.  As Bruce Eckel said, <a href="http://www.mindview.net/WebLog/log-0025" title="if it's not tested, it's broken">&#8220;if it&#8217;s not tested, it&#8217;s broken&#8221;</a>.<br /><br />So why am I a proponent of strongly-typed languages for many (but not all) problem sets?  Because they give us one thing dynamic languages by definition never will: unambiguous, guaranteed documentation.   Building large software systems means interfacing with subsystems written by others, and they must be documented.  Strongly-typed languages have an important part of that documentation built in: they precisely define the input and output types of each procedure call.  An API in a dynamic language needs the same documentation anyway, so why provide the chance for error?  Even for well-documented libraries, the reduced amount of code in the dynamic language is balanced by increased documentation.<br /><br />In fact, I&#8217;d like to see languages with even stronger guarantees.  A <a href="http://nice.sourceforge.net/language.html" title="Nice">Nice</a> addition to Java would be to define references that can never be null.  Many times I&#8217;ve used an API and asked, &#8220;do I need to check for null?&#8221;  The answer to my question should be part of the API itself.<br /><br />Of course, specific dynamic languages may have other advantages over their strongly-typed counterparts.  Also, some programs may not need the detailed level of documentation offered by strong typing.  Even so, type definitions are a key part of the documentation needed for a large system.</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/2/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/17/clara-0-dot-5-released/">Clara 0.5 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/06/clara-0-dot-4-released/">Clara 0.4 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/19/rules-as-data/">Rules as Data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/">Crossing the (Data) Streams&#58; Scalable Realtime Processing With Rules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/24/rules-as-a-control-structure/">Rules as a Control Structure</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/rbrush">@rbrush</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'rbrush',
+            count: 4,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<section><h1>Twitter</h1>
+<a class="twitter-timeline" href="https://twitter.com/ryanbrush" data-widget-id="477774048554795009">Tweets by @ryanbrush</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ryan Brush -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>What we can learn from databases - Too Much Code</title>
+  <meta name="author" content="Ryan Brush">
+
+  
+  <meta name="description" content="While not perfect, relational databases are among the most successful software ever used. Their behavior is easily understood even under high &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/2007/12/26/what-we-can-learn-from-databases/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Too Much Code" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-2927953-1']);
+    _gaq.push(['_setDomainName','toomuchcode.org']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Too Much Code</a></h1>
+  
+    <h2>Not enough cohesion</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.toomuchcode.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">What We Can Learn From Databases</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-12-26T12:19:04-06:00" pubdate data-updated="true">Dec 26<span>th</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">While not perfect, relational databases are among the most successful software ever used.  Their behavior is easily understood even under high concurrency. Sets of changes can be composed with almost no effort, with strong guarantees of consistency.  The question is: would this be true if we built our databases the same way we build applications?<br /><br />Transactions and read consistency would be the first to go.  Users must then cooperatively synchronize on some external monitor; any failure to do so can result in invalid data.  Next, system state and logic become intermixed.  Gone are simple ways to inspect the state of the system, or create a well-defined state space with known transitions.  In short, if databases were written like applications, they become vulnerable to all of the bugs we see in applications.<br /><br />Suppose we turn the question on its head, and ask what characteristics of the database we can apply to the rest of software?  Consider the following advantages:<br /><ul><li>The system itself guarantees a consistent view of data under concurrency, eliminating many types of race conditions</li><li>State changes are composable; updates are committed atomically, ensuring the database is never in an invalid state.<br /></li><li>The state space is understandable.  Because updates are composed to an atomic state change, countless permutations of state are eliminated</li></ul>The key is this: we can confidently inspect, reason about, and change the state space of a database.  The complexity of large models is mitigated by allowing only for valid, composable transitions.  Imagine if we had such guarantees when building software in general.  We could understand the state of an application at any time, and ensure all changes are valid and consistent.  Our system would be much more understandable and predictable.<br /><br />In fact, much language research is focused on this area.  <a title="Software-Transactional Memory" href="http://research.microsoft.com/%7Esimonpj/papers/stm/stm.pdf" id="r1g6">Software Transactional Memory</a> in languages like Haskell is the most visible.  The question is how such progress will reach the mainstream.  History suggests an evolutionary model.  Languages that gain adoption tend to have a good deal in common with an established language, lowering the barrier to entry.  Because of this, I have yet to see a language with the above characteristics that I think will achieve widespread adoption.  Hopefully that will change.<br /><br /><b>Understandable systems today<br /></b>A couple of <a title="recent" href="http://steve-yegge.blogspot.com/2007/12/codes-worst-enemy.html" id="b02u">recent</a> <a title="posts" href="http://www.codinghorror.com/blog/archives/001025.html" id="pqvj">posts</a> point out the burden of large code bases.  I agree, as suggested by the title of this blog, but it&#8217;s easy to confuse a symptom with the problem itself.  So I phrase it differently:  Unmanageable complexity is the enemy.  Code size is often what the enemy smells like.<br /><br />Developers can better manage complexity even without guarantees similar to what a database offers.  Code should have a clear, easily understood state space, preferably applying related changes atomically.  Such systems are easier to reason about and change because developers need not concern themselves with side effects of unrelated code; they can focus on the problem at hand.  For those who haven&#8217;t explored this, I&#8217;m indirectly describing the functional style of programming.  This is the great hope for pure functional programming: it may spread predictability and a simple model to all development.</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Ryan Brush</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-12-26T12:19:04-06:00" class="updated">Updated Dec 26<span>th</span>, 2007</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2007/12/26/what-we-can-learn-from-databases/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2007/12/26/what-we-can-learn-from-databases/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2007/11/04/the-design-crisis/" title="Previous Post: The Design Crisis">&laquo; The Design Crisis</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2008/01/06/end-of-softwares-dark-age/" title="Next Post: End of software's dark age?">End of software's dark age? &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/17/clara-0-dot-5-released/">Clara 0.5 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/06/clara-0-dot-4-released/">Clara 0.4 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/19/rules-as-data/">Rules as Data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/">Crossing the (Data) Streams&#58; Scalable Realtime Processing With Rules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/24/rules-as-a-control-structure/">Rules as a Control Structure</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/rbrush">@rbrush</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'rbrush',
+            count: 4,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<section><h1>Twitter</h1>
+<a class="twitter-timeline" href="https://twitter.com/ryanbrush" data-widget-id="477774048554795009">Tweets by @ryanbrush</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ryan Brush -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

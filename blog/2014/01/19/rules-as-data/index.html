@@ -1,0 +1,312 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Rules as Data - Too Much Code</title>
+  <meta name="author" content="Ryan Brush">
+
+  
+  <meta name="description" content="This started as a topic for a&nbsp;Lambda Lounge&nbsp;meetup but seems worth sharing broadly.I&#8217;ve posted previously about treating rules as a &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/2014/01/19/rules-as-data/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Too Much Code" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-2927953-1']);
+    _gaq.push(['_setDomainName','toomuchcode.org']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Too Much Code</a></h1>
+  
+    <h2>Not enough cohesion</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.toomuchcode.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Rules as Data</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2014-01-19T12:44:40-06:00" pubdate data-updated="true">Jan 19<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">This started as a topic for a&nbsp;<a href="http://www.meetup.com/lamba-lounge-kc/" target="_blank">Lambda Lounge</a>&nbsp;meetup but seems worth sharing broadly.<br />I&#8217;ve posted previously about treating <a href="http://www.toomuchcode.org/2013/09/rules-as-control-structure.html" target="_blank">rules as a control structure</a>, but for <a href="https://github.com/rbrush/clara-rules" target="_blank">Clara 0.4</a> rules are now first-class data structures with well-defined schema. &nbsp;The simple <i>defrule</i>&nbsp;syntax is preserved but the macro now produces a data structure that is used everywhere else. For example, the following code:<br />
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nf">defrule</span> <span class="nv">date-too-early</span>
+</span><span class='line'>  <span class="s">&quot;We can&#39;t schedule something too early.&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">WorkOrder</span> <span class="p">(</span><span class="nb">&lt; </span><span class="p">(</span><span class="nf">weeks-until</span> <span class="nv">date</span><span class="p">)</span> <span class="mi">2</span><span class="p">)]</span>
+</span><span class='line'>  <span class="nv">=&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">insert!</span> <span class="p">(</span><span class="nf">-&gt;ApprovalRequired</span> <span class="ss">:timeline</span> <span class="s">&quot;Date is too early&quot;</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+Defines a var containing this structure:<br />
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">{</span><span class="ss">:doc</span> <span class="s">&quot;We can&#39;t schedule something too early.&quot;</span>,
+</span><span class='line'> <span class="ss">:name</span> <span class="s">&quot;date-too-early&quot;</span>,
+</span><span class='line'> <span class="ss">:lhs</span>
+</span><span class='line'> <span class="p">[{</span><span class="ss">:constraints</span> <span class="p">[(</span><span class="nb">&lt; </span><span class="p">(</span><span class="nf">llkc.example/weeks-until</span> <span class="nv">date</span><span class="p">)</span> <span class="mi">2</span><span class="p">)]</span>,
+</span><span class='line'>   <span class="ss">:type</span> <span class="nv">llkc.example.WorkOrder</span><span class="p">}]</span>,
+</span><span class='line'> <span class="ss">:rhs</span>
+</span><span class='line'> <span class="p">(</span><span class="nf">clara.rules/insert!</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">llkc.example/-&gt;ApprovalRequired</span> <span class="ss">:timeline</span> <span class="s">&quot;Date is too early&quot;</span><span class="p">))}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+The rule structure itself is <a href="https://github.com/rbrush/clara-rules/blob/master/src/main/clojure/clara/rules/schema.clj#L50" target="_blank">defined in Clara&#8217;s schema</a>, and simply stored in the var with the rule&#8217;s name.<br /><br />So, now that rules are data, we open the door to tooling to explore and manipulate them. For instance, we can visualize the relationship between rules. Here is a visualization of the <a href="https://github.com/rbrush/presentations/blob/master/llkc-2014-jan/src/llkc/example.clj" target="_blank">rules used for the meetup</a>. I arbitrarily chose shapes to distinguish the different types of data:<br /><div class="separator" style="clear: both; text-align: center;"><br /></div><div class="separator" style="clear: both; text-align: center;"><a href="/images/rules-as-data-logic.png" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img border="0" src="/images/rules-as-data-logic-small.png" /></a></div><br /><br />This image is generated by running the following <a href="https://github.com/rbrush/clara-rules/blob/master/src/main/clojure/clara/tools/viz.clj" target="_blank">function from clara.tools.viz</a> against <a href="https://github.com/rbrush/presentations/blob/master/llkc-2014-jan/src/llkc/example.clj" target="_blank">the example used at the meetup</a>:<br />
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nf">viz/show-logic!</span> <span class="ss">&#39;llkc.example</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+That function simply scans each rule in the given namespace, reads individual conditions from the rule data structure, and wires them up. The graph itself is rendered with GraphViz.<br /><br />Since all rules of data, they can be filtered or manipulated like any Clojure data structure. So here we take our set of rules and only display those that handle logic for validation errors:<br />
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nf">viz/show-logic!</span>
+</span><span class='line'>  <span class="p">(</span><span class="nb">filter </span><span class="o">#</span><span class="p">(</span><span class="nf">viz/inserts?</span> <span class="nv">%</span> <span class="nv">ValidationError</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">viz/get-productions</span> <span class="p">[</span><span class="ss">&#39;llkc.example</span><span class="p">])))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+In this example there is only one rule that does validation, so the resulting image looks like this:<br /><div class="separator" style="clear: both; text-align: center;"><a href="/images/rules-as-data-valid.png" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img border="0" src="/images/rules-as-data-valid.png" height="169" width="320" /></a></div><br /><h2>Rule engine as an API</h2>The rules-as-data model creates another significant advantage: we have decoupled the DSL-style syntax from the rule engine itself. Clara users can now create rules from arbitrary sources, such as a specialized syntax, an external database, or domain-specific file format. (Think <a href="https://github.com/Engelberg/instaparse" target="_blank">instaparse</a> tied to rule generation.) Clara is evolving into a general Rete engine, with its &#8220;defrule&#8221; syntax being just one way to use it.<br /><br />So far I&#8217;ve written only simple, GraphViz-based visualizations but we can expose these with more sophisticated UIs. Projecting such visualizations onto, say, a D3-based graph could provide a rich, interactive way of exploring logic.<br /><br />At this point, <a href="https://github.com/rbrush/clara-rules" target="_blank">Clara 0.4 is available as snapshot builds</a>. I expect to do a release in February, pending some cleanup and enhancements to ClojureScript support. I&#8217;ll post updates on my twitter feed, <a href="https://twitter.com/ryanbrush" target="_blank">@ryanbrush</a>.</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Ryan Brush</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2014-01-19T12:44:40-06:00" class="updated">Updated Jan 19<span>th</span>, 2014</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2014/01/19/rules-as-data/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2014/01/19/rules-as-data/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/" title="Previous Post: Crossing the (data) streams&#58; scalable realtime processing with rules">&laquo; Crossing the (data) streams&#58; scalable realtime processing with rules</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2014/02/06/clara-0-dot-4-released/" title="Next Post: Clara 0.4 Released">Clara 0.4 Released &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/17/clara-0-dot-5-released/">Clara 0.5 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/06/clara-0-dot-4-released/">Clara 0.4 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/19/rules-as-data/">Rules as Data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/">Crossing the (Data) Streams&#58; Scalable Realtime Processing With Rules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/24/rules-as-a-control-structure/">Rules as a Control Structure</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/rbrush">@rbrush</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'rbrush',
+            count: 4,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<section><h1>Twitter</h1>
+<a class="twitter-timeline" href="https://twitter.com/ryanbrush" data-widget-id="477774048554795009">Tweets by @ryanbrush</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ryan Brush -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

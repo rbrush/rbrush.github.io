@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Tearing Down the Software Factory - Too Much Code</title>
+  <meta name="author" content="Ryan Brush">
+
+  
+  <meta name="description" content="Tom DeMarco said it well:The idea of a software factory is a joke &#8211; that we can build software by rote &#8211; that&#8217;s ridiculous. If the &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/2008/03/09/tearing-down-the-software-factory/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Too Much Code" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-2927953-1']);
+    _gaq.push(['_setDomainName','toomuchcode.org']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Too Much Code</a></h1>
+  
+    <h2>Not enough cohesion</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.toomuchcode.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Tearing Down the Software Factory</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2008-03-09T15:25:44-05:00" pubdate data-updated="true">Mar 9<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">Tom DeMarco <a title="said it well" href="http://www.amazon.com/Measuring-Managing-Performance-Organizations-Robert/dp/0932633366" id="wp1z">said it well</a>:<br /><blockquote>The idea of a software factory is a joke &#8211; that we can build software by rote &#8211; that&#8217;s ridiculous.  If the work is deterministic, we will do with it what we do with any other big piece of deterministic work.  We&#8217;ll let the computer do the deterministic portion, leaving the person who interacts with the computer &#8211; the other half of the system &#8211; to do the work whose roteness has decreased, not increased.  Every time you automate something, what&#8217;s left of the person&#8217;s work is less deterministic, until eventually, when you automate enough, there&#8217;s no deterministic element left for the person&#8217;s work&#8211;no rote. &#8230; Our work is not deterministic.  It&#8217;s far too inventive.  We&#8217;re knowledge workers, not factory workers.<br /></blockquote>Of course, similar thoughts have been articulated <a title="many" href="http://www.developerdotstar.com/mag/articles/reeves_design_main.html" id="j1bs">many</a> <a title="times" href="http://virtualschool.edu/mon/SoftwareEngineering/BrooksNoSilverBullet.html" id="s7.0">times</a> before, and was a theme of the <a title="previous post" href="http://www.toomuchcode.org/2007/10/design-crisis.html" id="oihe">previous post</a> on this blog.  The idea of a software factory contradicts our best understanding of the essence of software, yet industrial style command-and-control management of software continues.  Why is this?  One problem is we developers haven&#8217;t effectively presented a convincing alternative.  Remove command and control, and to some extent developers must manage themselves.  From <a title="Watts Humphrey" href="http://www.sei.cmu.edu/news-at-sei/columns/watts_new/2007/06/watts-new-2007-06.htm" id="hcuj">Watts Humphrey</a>:<br /><blockquote>Since your manager’s performance depends on your performance, and since the performance of software groups has historically been so poor, managers do not trust software professionals to manage themselves. To overcome this problem, all we have to do is to convince management that we can manage ourselves and then perform that self management so well that management will continue to trust us.<br /></blockquote>The theme of trust and credibility runs throughout Humphrey&#8217;s <a title="written extensively" href="http://www.sei.cmu.edu/news-at-sei/columns/watts_new/watts-new.htm" id="hbo3">extensive writing</a> on this topic.  This is not new, but progress has been slow.  The major obstacle is that managers rightly want concrete, objective data on which to base their decisions.  This conflicts with the black box that software development so often becomes.  We need better transparency.  It is time to open up the black box of software engineering.<br /><br /><b>The black box of software</b><br />Opening the black box means programmers and managers must meet each other halfway.  Managers must create and adapt to a new post-industrial management science, and programmers must produce data useful to that management science.   This does not mean attempting to make programmers into assembly line workers.  To the contrary, it means embracing the creative nature of software, and managing the output as a side effect of development.<br /><br />How do we do this?  Empirically manage everything that can be empirically managed, and complement it with the judgment of your best engineers.  Many pieces of the puzzle already exist.  <a title="Unit testing" href="http://en.wikipedia.org/wiki/Unit_testing" id="lze7">Unit testing</a>, <a title="code coverage reports" href="http://en.wikipedia.org/wiki/Code_coverage" id="rqf8">code coverage reports</a>, <a title="bug tracking" href="http://en.wikipedia.org/wiki/Bug_tracking_system" id="gezm">bug tracking</a>, <a title="static code analysis" href="http://en.wikipedia.org/wiki/Static_code_analysis" id="z03-">static code analysis</a>, dependency management and others provide transparency into the state of a project.  Such data is purely informational, but technically inclined managers can and should use it to ensure a project is on track.  With context, problems like bloated dependencies, poor test coverage, or fixing related bugs many times are all signs of a project going astray.  Modern software organizations must be able to detect and correct problems before they grow.<br /><br />Unfortunately many managers today are not equipped to work with such data.  This must change.  Managers must build their skill sets for the post-industrial world.<br /><br /><b>Trust through transparency<br /></b>Of course tools like code coverage and defect tracking only tell part of the story.  <a title="Code is design" href="http://www.toomuchcode.org/2007/10/design-crisis.html" id="f.tg">Code is design</a>, and no set of tools can define the quality or progress of design.  Therefore we must complement these tools with the best judgment of our best engineers.  But if managers don&#8217;t trust the best engineers, this judgment is wasted.<br /><br />So how do we solve this?  Use transparency into software as a tool for building trust.   Concrete data on the progress and quality of software gives managers greater confidence in engineers, even if the picture is incomplete.  Trust begins to grow.  Engineers should qualify empirical data and use it appropriately as a basis for design decisions.   If we can provide managers a glimpse into software and prove we are making progress, they will be more willing to accept our opinions.<br /><br />Some tension between managers and developers may be inevitable, but we can meet each other halfway.  Our development practices should yield hard data for everything appropriate.  In exchange managers must accept that code is design and trust the judgment of developers.</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Ryan Brush</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2008-03-09T15:25:44-05:00" class="updated">Updated Mar 9<span>th</span>, 2008</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2008/03/09/tearing-down-the-software-factory/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2008/03/09/tearing-down-the-software-factory/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2008/01/06/end-of-softwares-dark-age/" title="Previous Post: End of software's dark age?">&laquo; End of software's dark age?</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2008/11/15/the-guru-myth/" title="Next Post: The Guru Myth">The Guru Myth &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/17/clara-0-dot-5-released/">Clara 0.5 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/06/clara-0-dot-4-released/">Clara 0.4 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/19/rules-as-data/">Rules as Data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/">Crossing the (Data) Streams&#58; Scalable Realtime Processing With Rules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/24/rules-as-a-control-structure/">Rules as a Control Structure</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/rbrush">@rbrush</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'rbrush',
+            count: 4,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<section><h1>Twitter</h1>
+<a class="twitter-timeline" href="https://twitter.com/ryanbrush" data-widget-id="477774048554795009">Tweets by @ryanbrush</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ryan Brush -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

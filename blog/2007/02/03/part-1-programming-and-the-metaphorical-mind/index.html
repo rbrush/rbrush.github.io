@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Part 1&#58;  Programming and the Metaphorical Mind - Too Much Code</title>
+  <meta name="author" content="Ryan Brush">
+
+  
+  <meta name="description" content="Hello, WorldThis is the first of a set of posts on what we need from a new programming language. Everything I discuss exists in some language &#8211 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/2007/02/03/part-1-programming-and-the-metaphorical-mind/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Too Much Code" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-2927953-1']);
+    _gaq.push(['_setDomainName','toomuchcode.org']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Too Much Code</a></h1>
+  
+    <h2>Not enough cohesion</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.toomuchcode.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Part 1&#58; Programming and the Metaphorical Mind</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-02-03T15:17:57-06:00" pubdate data-updated="true">Feb 3<span>rd</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><span style="font-weight: bold;">Hello, World</span><br />This is the first of a set of posts on what we need from a new programming language.  Everything I discuss exists in some language &#8211; at least in part &#8211; but no language yet has them all.  This content is a mixture of my experience and many borrowed ideas, which I will do my best to cite.  My goal is to represent the language needs of some segment of developers.<br /><br /><span style="font-weight: bold;">The Metaphorical Mind</span><br />I&#8217;ll start simply: a language must be designed and taught with its users in mind.  There is a psychology to programming which may explain why some languages get adopted and better ones don&#8217;t.  To model this psychology, I borrow the idea of the &#8220;Metaphorical Mind&#8221;<span style="font-style: italic;"><span style="font-style: italic;">,</span></span> as described in Steven Pinker&#8217;s excellent <a title="How the Mind Works" href="http://pinker.wjh.harvard.edu/books/htmw/index.html">How the Mind Works</a>.   In Pinker&#8217;s words, &#8220;The human mind, we see, is not equipped with an evolutionarily frivolous faculty for doing Western science, mathematics, chess, or other diversions.&#8221;  Our minds evolved to work with the physical world, and we reason with abstract ideas using physical metaphors.  Pinker cites Ray Jackendoff for examples:<br /><br />The messenger <span style="font-style: italic;">went from</span> Paris <span style="font-style: italic;">to</span> Istanbul.<br />The inheritance finally <span style="font-style: italic;">went to </span>Fred.<br />The light <span style="font-style: italic;">went from</span> green <span style="font-style: italic;">to</span> red.<br />The meeting <span style="font-style: italic;">went from</span> 3:00 <span style="font-style: italic;">to</span> 4:00.<br /><br />(emphasis in original)<br /><br />The first sentence shows physical movement; the others use the same terms but have nothing moving.  Beyond movement, spatial metaphors permeate our thoughts and language.  &#8220;The meeting is <span style="font-style: italic;">at</span> 3:00&#8221;, for instance.  In fact, it&#8217;s hard to describe almost anything without physical metaphors.<br /><br />Many examples exist in software.  Imperative programmers deal with <span style="font-style: italic;">pointers, objects, stacks, messages, events</span> and so on.  Our secondary storage uses <span style="font-style: italic;">folders, files</span> and <span style="font-style: italic;">paths.</span><br /><br />In fact, there is an alarming predictability on language adoption: languages that strengthen the physical metaphor &#8211; or at least solve problems without weakening it &#8211; have found widespread use.  Languages with weaker physical metaphors remain with a small base.  Compare the adoption rates of object-oriented languages to their functional counterparts.<br /><br />This might be an indictment of functional languages, since they are typical expressed in abstract mathematics rather than physical analogs.  That is unfair.  Functional languages can be built and explained in straightforward physical terms &#8211; they just aren&#8217;t.  Take, for instance, Haskell&#8217;s Monad.  I&#8217;ve written only small programs in Haskell, but for my purposes it&#8217;s much easier to think of a Monad as a &#8220;to-do list&#8221;.  (Some use the term &#8220;action&#8221;.  I know it&#8217;s an over-simplification, but that&#8217;s the point.)  The bulk of the language is a means to construct to-do lists in isolation.  Put in these terms, Haskell can be simpler than many languages &#8211; the functional purity eliminates all kinds of moving parts imperative programmers have to worry about.<br /><br />This is a good step, but widespread adoption means more than renaming of concepts.  Unfortunately, programmers who find and learn functional languages are not representative of the population.  I&#8217;m afraid we would lose a broader audience in the first hour of learning Haskell, as soon as they got to this:<br /><br /><code>fibs = 1: 1: zipWith (+) fibs (tail fibs)</code><br /><br />Beautiful, isn&#8217;t it?  One line of code for Fibonacci numbers, what amounts to built-in memoization, the ability to get and manipulate any sequence, and so on.  But it also has only the weakest of ties to a physical analog.  Non-trivial examples are much harder to understand.  Sadly, an incredibly powerful tool for some is simply too abstract for others to use effectively.<br /><br />Because of this and other examples, I doubt Haskell will ever be widely used despite all of its advantages.  But this is okay &#8211; we need powerful tools for the hands of experts.  What I want to see is a more accessible language borrowing the best ideas from Haskell and others.  I wish I could use Monads every day, and am willing to sacrifice some of Haskell&#8217;s other power to achieve this.<br /><br />This raises an important question: shouldn&#8217;t we raise our expectations of developers rather than take away powerful features?  A valid point, which I will tackle this in my next post.<span style="font-style: italic;"></span>  For now, the central thesis of these posts should start to emerge: we need a language with the best parts of Haskell and others in a more accessible form.</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Ryan Brush</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-02-03T15:17:57-06:00" class="updated">Updated Feb 3<span>rd</span>, 2007</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2007/02/03/part-1-programming-and-the-metaphorical-mind/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2007/02/03/part-1-programming-and-the-metaphorical-mind/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2006/12/26/the-software-engineers-new-clothes/" title="Previous Post: The Software Engineer's New Clothes">&laquo; The Software Engineer's New Clothes</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2007/02/07/part-2-languages-and-the-lesser-skilled-developer/" title="Next Post: Part 2&#58; Languages and the Lesser-Skilled Developer">Part 2&#58; Languages and the Lesser-Skilled Developer &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/17/clara-0-dot-5-released/">Clara 0.5 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/06/clara-0-dot-4-released/">Clara 0.4 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/19/rules-as-data/">Rules as Data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/">Crossing the (Data) Streams&#58; Scalable Realtime Processing With Rules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/24/rules-as-a-control-structure/">Rules as a Control Structure</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/rbrush">@rbrush</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'rbrush',
+            count: 4,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<section><h1>Twitter</h1>
+<a class="twitter-timeline" href="https://twitter.com/ryanbrush" data-widget-id="477774048554795009">Tweets by @ryanbrush</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ryan Brush -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

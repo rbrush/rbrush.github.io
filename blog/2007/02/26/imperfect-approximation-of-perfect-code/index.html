@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Imperfect Approximation of Perfect Code - Too Much Code</title>
+  <meta name="author" content="Ryan Brush">
+
+  
+  <meta name="description" content="It needs to be said: the quality of a programming language is not inversely proportional to the number of bytes needed for a Sudoku solver. Not that &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/2007/02/26/imperfect-approximation-of-perfect-code/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Too Much Code" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-2927953-1']);
+    _gaq.push(['_setDomainName','toomuchcode.org']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Too Much Code</a></h1>
+  
+    <h2>Not enough cohesion</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.toomuchcode.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Imperfect Approximation of Perfect Code</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-02-26T23:49:00-06:00" pubdate data-updated="true">Feb 26<span>th</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">It needs to be said: the quality of a programming language is not inversely proportional to the number of bytes needed for a Sudoku solver.  Not that there&#8217;s anything wrong with comparing Sudoku solvers; they can contrast certain aspects of languages, and differing solution styles can help readers think differently about code.  But this only gets us so far.<br /><br />The problem is the public language debate rarely ranges to topics that span more than a couple dozen lines of code.  Anything bigger is difficult to manage in a single discussion.  Therefore we need a model to debate the higher-order concerns of programming languages.  Fortunately, I&#8217;m shameless, and will shamelessly steal such a model from Donald Norman&#8217;s excellent <a href="http://mitpress.mit.edu/catalog/item/default.asp?tid=5393&ttype=2" title="Design of Everyday Things">Design of Everyday Things</a>.<br /><br />The idea I&#8217;m referring to is Norman&#8217;s modeling of human interaction with software and physical tools as a <span style="font-style: italic;">series of imperfect approximations to approach a perfect goal.</span>  A system should assume all user input is imperfect, but guide the user to her goal.  A user should have feedback indicating progress toward the goal.  Mistakes should be easily reversible and never take her far astray.<br /><br />Let&#8217;s apply this to programming languages and practices.  The biggest step forward in recent years has been the adoption of test-driven development.  This fits nicely &#8211; a solid safety net of unit tests allows developers to move towards the perfect goal.  It also brings to mind a humorous <a href="http://programmingkungfuqi.blogspot.com/2007/02/real-reason-why-building-software-is.html" title="recent post">recent post</a> by <span class="misspell" suggestions="Jet,Jot,Jut,Kt,Jct">Jt</span> Gleason.  One of the reasons programming is harder than bridge building is even small defects can cause us to jump radically away from our goal.<br /><br />So, what can improved languages and practices do to help?  They can guarantee no programmer mistake will cause us to jump to across an ocean, to use Gleason&#8217;s metaphor.  Programming will never be truly analogous to bridge building, but if bugs can be localized &#8211; like how a bad bolt is localized for a bridge &#8211; we might make progress.  We can&#8217;t eliminate bugs, but we can bound them and trend towards perfection.  This reminds me of a <span class="misspell" suggestions="Piety,Poet,PET,Pet,Pit">Piet</span> <span class="misspell" suggestions="He in,He-in,Heine,Hen,Heinz">Hein</span> poem reportedly displayed in Donald Knuth&#8217;s home:<br /><span style="font-style: italic;"></span><blockquote><span style="font-style: italic;"> The road to wisdom? Well, it&#8217;s plain<br /></span><span style="font-style: italic;"> And simple to express:</span><br /><span style="font-style: italic;"> Err</span><br /><span style="font-style: italic;"> and err</span><br /><span style="font-style: italic;"> and err again</span><br /><span style="font-style: italic;"> but less</span><br /><span style="font-style: italic;"> and less</span><br /><span style="font-style: italic;"> and less.</span></blockquote><span style="font-style: italic;"></span>  With all this in mind, I recently saw something that just might be a glimpse of the future.  Giles <span class="misspell" suggestions="Beckett,Becket,Bocked,Booked,Bucket">Bowkett</span> posted a <a href="http://gilesbowkett.blogspot.com/2007/01/seaside-screencasts.html" title="screencast"><span class="misspell" suggestions="screen cast,screen-cast,scrawniest,scroungiest,crankest">screencast</span></a> showing modification of code in a Seaside-based web application as it was running.  Sure, we&#8217;ve been able to hot-swap code for a while, but that&#8217;s usually a painful process requiring specific launch configuration and use of an external debugger.  Imagine if every menu in every program had an &#8220;edit&#8221; button available to experts, allowing them to adjust code on the fly.  The code-build-test-debug loop would become instantaneous, applications could be grown in the context of existing pieces, and good design and languages can prevent local bugs from creeping elsewhere.  This is our series of approximations toward a perfect goal.<br /><br />Of course, the above ideal might be unachievable for many applications.  Even so, it still might be possible to build an imperfect approximation.</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Ryan Brush</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-02-26T23:49:00-06:00" class="updated">Updated Feb 26<span>th</span>, 2007</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2007/02/26/imperfect-approximation-of-perfect-code/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2007/02/26/imperfect-approximation-of-perfect-code/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2007/02/08/part-4-the-killer-app/" title="Previous Post: Part 4&#58; The Killer App">&laquo; Part 4&#58; The Killer App</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2007/04/08/the-imaginary-concurrency-debate/" title="Next Post: The Imaginary Concurrency Debate">The Imaginary Concurrency Debate &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/17/clara-0-dot-5-released/">Clara 0.5 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/06/clara-0-dot-4-released/">Clara 0.4 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/19/rules-as-data/">Rules as Data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/">Crossing the (Data) Streams&#58; Scalable Realtime Processing With Rules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/24/rules-as-a-control-structure/">Rules as a Control Structure</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/rbrush">@rbrush</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'rbrush',
+            count: 4,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<section><h1>Twitter</h1>
+<a class="twitter-timeline" href="https://twitter.com/ryanbrush" data-widget-id="477774048554795009">Tweets by @ryanbrush</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ryan Brush -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

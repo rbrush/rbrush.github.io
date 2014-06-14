@@ -1,0 +1,581 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Too Much Code</title>
+  <meta name="author" content="Ryan Brush">
+
+  
+  <meta name="description" content="Anyone who has worked in software long enough has heard questions like this:I&#8217;m getting exception XYZ. Do you know what the problem is?The &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/page/2/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Too Much Code" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-2927953-1']);
+    _gaq.push(['_setDomainName','toomuchcode.org']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Too Much Code</a></h1>
+  
+    <h2>Not enough cohesion</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.toomuchcode.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2008/11/15/the-guru-myth/">The Guru Myth</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2008-11-15T12:59:04-06:00" pubdate data-updated="true">Nov 15<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">Anyone who has worked in software long enough has heard questions like this:<br /><br /><div style="text-align: center;"><i>I&#8217;m getting exception XYZ.  Do you know what the problem is?</i><br /></div><i><br /></i>The questioner didn&#8217;t bother to include a stack trace, an error log, or any context leading to the problem.  He or she seems to think you operate on a different plane, that solutions appear to you without analysis based on evidence.  This person thinks you are a guru.<br /><br />We expect such questions from those unfamiliar with software; to them systems can seem almost magical.  What worries me is seeing this in the software community.  Similar questions arise in program design, such as &#8220;I&#8217;m building inventory management.  Should I use optimistic locking?&#8221;  Ironically, the person asking the question is often better equipped to answer it than the question&#8217;s recipient.  The questioner presumably knows the context, knows the requirements, and can read about the advantages and disadvantages of different strategies.  Yet this person expects an intelligent answer without supplying context.  He or she expects magic.<br /><br />It&#8217;s time for the software industry to dispel this guru myth.  &#8220;Gurus&#8221; are human; they apply logic and systematically analyze problems like the rest of us.  Consider the best programmer you&#8217;ve ever met:  At one point he or she knew less about software than you do now.  If that person seems like a guru, it&#8217;s because of years dedicated to learning and refining thought processes.  A &#8220;guru&#8221; is simply a smart person with relentless curiosity.<br /><br />Of course, there remains a huge variance in natural aptitude.  Many hackers out there are smarter, more knowledgeable, and more productive than I may ever be.  Even so, debunking the guru myth has a positive impact.  For instance, when working with someone smarter than me I am sure to do the legwork, to provide enough context so that person can efficiently apply his or her skills.  Removing the guru myth also means removing a perceived barrier to improvement.  Instead of a barrier I see a continuum on which I can advance.<br /><br />Finally, one of software&#8217;s biggest obstacles is smart people who purposefully propagate the guru myth.  This might be done out of ego, or as a strategy to increase one&#8217;s value as perceived by a client or employer.  Ironically this attitude makes a smart person less valuable, since they don&#8217;t contribute to the growth of their peers.  We don&#8217;t need gurus.  We need experts willing to develop other experts in their field.  There is room for all of us.</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2008/03/09/tearing-down-the-software-factory/">Tearing Down the Software Factory</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2008-03-09T15:25:44-05:00" pubdate data-updated="true">Mar 9<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">Tom DeMarco <a title="said it well" href="http://www.amazon.com/Measuring-Managing-Performance-Organizations-Robert/dp/0932633366" id="wp1z">said it well</a>:<br /><blockquote>The idea of a software factory is a joke &#8211; that we can build software by rote &#8211; that&#8217;s ridiculous.  If the work is deterministic, we will do with it what we do with any other big piece of deterministic work.  We&#8217;ll let the computer do the deterministic portion, leaving the person who interacts with the computer &#8211; the other half of the system &#8211; to do the work whose roteness has decreased, not increased.  Every time you automate something, what&#8217;s left of the person&#8217;s work is less deterministic, until eventually, when you automate enough, there&#8217;s no deterministic element left for the person&#8217;s work&#8211;no rote. &#8230; Our work is not deterministic.  It&#8217;s far too inventive.  We&#8217;re knowledge workers, not factory workers.<br /></blockquote>Of course, similar thoughts have been articulated <a title="many" href="http://www.developerdotstar.com/mag/articles/reeves_design_main.html" id="j1bs">many</a> <a title="times" href="http://virtualschool.edu/mon/SoftwareEngineering/BrooksNoSilverBullet.html" id="s7.0">times</a> before, and was a theme of the <a title="previous post" href="http://www.toomuchcode.org/2007/10/design-crisis.html" id="oihe">previous post</a> on this blog.  The idea of a software factory contradicts our best understanding of the essence of software, yet industrial style command-and-control management of software continues.  Why is this?  One problem is we developers haven&#8217;t effectively presented a convincing alternative.  Remove command and control, and to some extent developers must manage themselves.  From <a title="Watts Humphrey" href="http://www.sei.cmu.edu/news-at-sei/columns/watts_new/2007/06/watts-new-2007-06.htm" id="hcuj">Watts Humphrey</a>:<br /><blockquote>Since your manager’s performance depends on your performance, and since the performance of software groups has historically been so poor, managers do not trust software professionals to manage themselves. To overcome this problem, all we have to do is to convince management that we can manage ourselves and then perform that self management so well that management will continue to trust us.<br /></blockquote>The theme of trust and credibility runs throughout Humphrey&#8217;s <a title="written extensively" href="http://www.sei.cmu.edu/news-at-sei/columns/watts_new/watts-new.htm" id="hbo3">extensive writing</a> on this topic.  This is not new, but progress has been slow.  The major obstacle is that managers rightly want concrete, objective data on which to base their decisions.  This conflicts with the black box that software development so often becomes.  We need better transparency.  It is time to open up the black box of software engineering.<br /><br /><b>The black box of software</b><br />Opening the black box means programmers and managers must meet each other halfway.  Managers must create and adapt to a new post-industrial management science, and programmers must produce data useful to that management science.   This does not mean attempting to make programmers into assembly line workers.  To the contrary, it means embracing the creative nature of software, and managing the output as a side effect of development.<br /><br />How do we do this?  Empirically manage everything that can be empirically managed, and complement it with the judgment of your best engineers.  Many pieces of the puzzle already exist.  <a title="Unit testing" href="http://en.wikipedia.org/wiki/Unit_testing" id="lze7">Unit testing</a>, <a title="code coverage reports" href="http://en.wikipedia.org/wiki/Code_coverage" id="rqf8">code coverage reports</a>, <a title="bug tracking" href="http://en.wikipedia.org/wiki/Bug_tracking_system" id="gezm">bug tracking</a>, <a title="static code analysis" href="http://en.wikipedia.org/wiki/Static_code_analysis" id="z03-">static code analysis</a>, dependency management and others provide transparency into the state of a project.  Such data is purely informational, but technically inclined managers can and should use it to ensure a project is on track.  With context, problems like bloated dependencies, poor test coverage, or fixing related bugs many times are all signs of a project going astray.  Modern software organizations must be able to detect and correct problems before they grow.<br /><br />Unfortunately many managers today are not equipped to work with such data.  This must change.  Managers must build their skill sets for the post-industrial world.<br /><br /><b>Trust through transparency<br /></b>Of course tools like code coverage and defect tracking only tell part of the story.  <a title="Code is design" href="http://www.toomuchcode.org/2007/10/design-crisis.html" id="f.tg">Code is design</a>, and no set of tools can define the quality or progress of design.  Therefore we must complement these tools with the best judgment of our best engineers.  But if managers don&#8217;t trust the best engineers, this judgment is wasted.<br /><br />So how do we solve this?  Use transparency into software as a tool for building trust.   Concrete data on the progress and quality of software gives managers greater confidence in engineers, even if the picture is incomplete.  Trust begins to grow.  Engineers should qualify empirical data and use it appropriately as a basis for design decisions.   If we can provide managers a glimpse into software and prove we are making progress, they will be more willing to accept our opinions.<br /><br />Some tension between managers and developers may be inevitable, but we can meet each other halfway.  Our development practices should yield hard data for everything appropriate.  In exchange managers must accept that code is design and trust the judgment of developers.</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2008/01/06/end-of-softwares-dark-age/">End of Software&#8217;s Dark Age?</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2008-01-06T21:51:50-06:00" pubdate data-updated="true">Jan 6<span>th</span>, 2008</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">Software has held more promise and yet met with more failure than any other technology.  Meanwhile the hardware guys have been merrily creating more and more CPU cycles for us to swamp.<br /><br />A lot has been written about why software sucks.  <span style="font-style: italic;"> </span>Fred Brooks famously predicted there would be <a title="no silver-bullet" href="http://inst.eecs.berkeley.edu/%7Emaratb/readings/NoSilverBullet.html">no silver bullet</a>   improvement in software productive over the next ten years.  That was twenty years ago, but there are signs that the dark age of software might be slowly and quietly coming to an end.<br /><br />Brooks was right about the lack of a silver bullet, of course.  But since then we&#8217;ve learned that we&#8217;ve been trying to kill the wrong monster.  Building a program was compared to the reliable timeline and quality of building a bridge or skyscraper, and we were mystified on how to get there.  This is the wrong monster; instead we need to view code as design and adopt our practices to match.  Coding is a creative process with much more in common with design than with any industrial process &#8211; <a href="http://www.developerdotstar.com/mag/articles/reeves_design_main.html" title="Jack Reeves got it right">Jack Reeves got it right</a>.<br /><br />Notice successful development methodologies jibe with viewing code as design.  We unit test because a design isn&#8217;t complete until validated with a simulation.  We work in iterations because a change in one part of the design affects others.  We document in the source code itself because that is the definitive source of design.<br /><br />The code-is-design perspective also predicts many supposed mysteries: huge productivity variance, a high number of defects, and failures of rote process are all expected in unvalidated, untested design.<br /><br /><span style="font-weight: bold;">Mysteries and Problems</span><br />Fortunately we&#8217;ve taken an important step: software development was once a mystery in search of a silver bullet; now it is a problem with real progress.  Noam Chomsky pointed out the first step to understanding the natural world is to turn mysteries into problems.  We&#8217;re seeing the same with software engineering.<br /><br />Given the premise of code being design, here are some steps to take us in the right direction:<br /><br />1. Boil out the remaining accidents.  We can still have race conditions or leak resources in many programming languages.  Newer languages should make these mistakes impossible.  We can also learn from existing languages.  For instance, the messaging model in Erlang prevents many types of timing problems.   Functional languages may eliminate the many types of bugs which arise from side effects.  The essence of a design should not be concerned with timing or unexpected side effects, so whenever possible this should be solved in the language itself.<br /><br />2. Make validation of designs easy.  How about the following requirement for a new programming language:   <br /><br />   <span>It must be straightforward to write a unit test to reproduce any possible bug.</span><br /><br />Since designs must be validated with computer simulation, we must make those simulations easy.  Huge strides have been made with various unit testing frameworks, but there are still shortcomings.  Proofs of correctness are impractical for most systems, but the ability to easily assert a system doesn&#8217;t have a particular bug is the next best thing.  Furthermore, any bug discovered at any time should be added to the test suite to make sure it never occurs again.  This ensures the defect rate of a system trends towards zero.<br /><br />3.  Design and code should merge into a single artifact.  We still need design at a higher level than current programming languages, but this design needs to be an asset rather than a burden that gets out of synch with the code.<br /><br />We are already seeing this: documentation has been merged with source code and tools convert code to UML diagrams and vice versa.  But there is a lot of room for improvement.  Code in object-oriented languages often includes many unessential objects that are just noise from a high-level view.  These should be eliminated from the language, or at least filtered from the high-level design.<br /><br />There are surely many other examples that I&#8217;m overlooking, and functional languages do hold promise.  What&#8217;s important is we now have an idea of why software sucks, and an inkling of what the solution might be.</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2007/12/26/what-we-can-learn-from-databases/">What We Can Learn From Databases</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-12-26T12:19:04-06:00" pubdate data-updated="true">Dec 26<span>th</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">While not perfect, relational databases are among the most successful software ever used.  Their behavior is easily understood even under high concurrency. Sets of changes can be composed with almost no effort, with strong guarantees of consistency.  The question is: would this be true if we built our databases the same way we build applications?<br /><br />Transactions and read consistency would be the first to go.  Users must then cooperatively synchronize on some external monitor; any failure to do so can result in invalid data.  Next, system state and logic become intermixed.  Gone are simple ways to inspect the state of the system, or create a well-defined state space with known transitions.  In short, if databases were written like applications, they become vulnerable to all of the bugs we see in applications.<br /><br />Suppose we turn the question on its head, and ask what characteristics of the database we can apply to the rest of software?  Consider the following advantages:<br /><ul><li>The system itself guarantees a consistent view of data under concurrency, eliminating many types of race conditions</li><li>State changes are composable; updates are committed atomically, ensuring the database is never in an invalid state.<br /></li><li>The state space is understandable.  Because updates are composed to an atomic state change, countless permutations of state are eliminated</li></ul>The key is this: we can confidently inspect, reason about, and change the state space of a database.  The complexity of large models is mitigated by allowing only for valid, composable transitions.  Imagine if we had such guarantees when building software in general.  We could understand the state of an application at any time, and ensure all changes are valid and consistent.  Our system would be much more understandable and predictable.<br /><br />In fact, much language research is focused on this area.  <a title="Software-Transactional Memory" href="http://research.microsoft.com/%7Esimonpj/papers/stm/stm.pdf" id="r1g6">Software Transactional Memory</a> in languages like Haskell is the most visible.  The question is how such progress will reach the mainstream.  History suggests an evolutionary model.  Languages that gain adoption tend to have a good deal in common with an established language, lowering the barrier to entry.  Because of this, I have yet to see a language with the above characteristics that I think will achieve widespread adoption.  Hopefully that will change.<br /><br /><b>Understandable systems today<br /></b>A couple of <a title="recent" href="http://steve-yegge.blogspot.com/2007/12/codes-worst-enemy.html" id="b02u">recent</a> <a title="posts" href="http://www.codinghorror.com/blog/archives/001025.html" id="pqvj">posts</a> point out the burden of large code bases.  I agree, as suggested by the title of this blog, but it&#8217;s easy to confuse a symptom with the problem itself.  So I phrase it differently:  Unmanageable complexity is the enemy.  Code size is often what the enemy smells like.<br /><br />Developers can better manage complexity even without guarantees similar to what a database offers.  Code should have a clear, easily understood state space, preferably applying related changes atomically.  Such systems are easier to reason about and change because developers need not concern themselves with side effects of unrelated code; they can focus on the problem at hand.  For those who haven&#8217;t explored this, I&#8217;m indirectly describing the functional style of programming.  This is the great hope for pure functional programming: it may spread predictability and a simple model to all development.</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2007/11/04/the-design-crisis/">The Design Crisis</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-11-04T08:13:43-06:00" pubdate data-updated="true">Nov 4<span>th</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">Imagine waking up tomorrow and learning the construction industry has made the breakthrough of the century.  Millions of cheap, incredibly fast robots can now fabricate materials out of thin air, have a near-zero power cost, and can repair themselves.  And it gets better: given an unambiguous blueprint for a construction project, the robots can build it without human intervention, all at negligible cost.<br /><br />One can imagine the impact to the construction industry, but what would happen upstream?  How would the behavior of architects and designers change if construction costs are negligible?  Today, physical and computer models are built and rigorously tested before investing in construction.  Would we bother if the construction was essentially free?  If a design collapses, no big deal&#8230;just find out what went wrong and have our magical robots build another one.  More implications follow.  With models obsolete, unfinished designs evolve by repeatedly building and improving upon an approximation of the end goal.  A casual observer may have trouble distinguishing an unfinished design from a finished product.<br /><br />Our ability to predict time lines will fade away as well.  Construction costs are more easily calculated than design costs &#8211; we know the approximate cost to install a girder, and how many girders we need.  As predictable tasks shrink toward zero, the less predictable design time grows to dominate the project.  Results are produced more quickly than before, but reliable time lines slip away.<br /><br />Of course, the pressures of a competitive economy still apply.  With construction costs eliminated, a company that can quickly complete a design gains a market edge.  Pressure on getting design done fast becomes the central push of engineering firms.  Inevitably, someone not deeply familiar with the design will see an unvalidated version, see the market advantage of releasing early, and say &#8220;This looks good enough.&#8221;<br /><br />Some life-or-death projects will be more diligent, but in many cases consumers learn to suffer through the incomplete design.  Companies can always send out our magic robots to &#8220;patch&#8221; the broken buildings and vehicles they sell.  All of this points to an amazing, counter-intuitive conclusion: our sole premise was a dramatic reduction in construction costs, and the result is<i> quality got worse.</i><i> </i><br /><b><br />The Design Crisis<br /></b> It shouldn&#8217;t surprise us the above story has played out in software.  If we accept that <a href="http://www.developerdotstar.com/mag/articles/reeves_design_main.html" id="oj-0" title="code is design">code is design</a> &#8211; a creative process rather than a mechanical one &#8211; the software crisis is explained.   Now we have a design crisis:<i> </i>the demand for quality, validated designs far exceeds our capacity to create them.  The pressure to use incomplete design is strong.<br /><br />Fortunately, this model also gives us some clues on how we can get better.  Physical simulations equate to automated testing; software design isn&#8217;t complete until it is validated with a brutal battery of such tests.  To make such tests more effective we are finding ways to rein in the huge state space of large systems.  Improved languages and design practices give us hope.  Most importantly, there is one inescapable fact.  Great designs are produced by great designers dedicating themselves to the mastery of their craft.  Code is no different.</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2007/06/30/von-neumanns-long-farewell/">Von Neumann&#8217;s Long Farewell</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-06-30T13:44:42-05:00" pubdate data-updated="true">Jun 30<span>th</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">A big step in solving the software crisis is to accept that programming is not about computers.  Yes, it used to be, and still is for brave souls working on operating systems or compilers.   But in the long list of the world&#8217;s software struggles, compilers rank pretty low.<br /><br />It&#8217;s easy to think programming is about computers because that&#8217;s where we see problems.  Of course, these are only symptoms of human error.  Developers are constantly stretching to express behavior in terms friendly to a computer, making life harder so we can be easier on our machines.  Such problems have been pointed out decades ago by the likes of <a href="http://www.cs.utexas.edu/%7EEWD/transcriptions/EWD03xx/EWD340.html" title="Dijkstra">Dijkstra</a>, <a href="http://www.stanford.edu/class/cs242/readings/backus.pdf" title="Backus [pdf]">Backus [pdf]</a>, and <a href="http://mitpress.mit.edu/sicp/full-text/book/book.html" title="Abelson and Sussman">Abelson and Sussman</a>.  Surely there is a way to describe our systems better than the terms of the von Neumann architecture.<br /><br />For years we were limited by the capabilities of the machines, but this limitation has vanished for most of us.  We&#8217;ve entered a new era, where improving the way we build software is as much a social problem as a technical one.  Fortunately, there are signs of a growing social bedrock that could finally help us.<br /><b><br />The Thirst for Abstraction</b><br />For a long time I didn&#8217;t understand Guy Steele&#8217;s comments on how Java can pull C++ developers about halfway to Lisp.  Surely that fraction must be off; writing code in Java certainly feels a lot closer to C++ than Lisp.  But independent of the Java language, the platform did a major service for the industry: it proved to the masses that we no longer need to express our designs directly in terms of the von Neumann architecture.<br /><br />The abstraction offered by Java-like languages is small but significant.  The conventional wisdom in software has long held that code must be expressed in terms of the machine to achieve passable performance.  This myth is gone.  Nearly every major software company is adopting some form of garbage collected, virtual machine-based language.  We rely on the platform to map our higher-level expressions to efficient machine code.<br /><br />This is a big step because accepting this level of abstraction opens the door to others.  Why should we explicitly state data type information, when it can be inferred at compile or run time?  Why not abandon primitives and arrays for objects and lists, since our platforms can now optimize away unneeded allocation?  Why struggle with keeping track of many small state changes when major operations could change state atomically?  Such abstractions make life easier for us, and previous successes suggest it will work.  The result is a self-perpetuating thirst for abstraction.  Expressing designs so humans can easily reason about and manipulate them is addicting.<br /><br /><b>von Neumann&#8217;s Long Farewell</b><br />For many of us the shift away from the von Neumann architecture is painfully slow.   Unfortunately the best ideas are often slow to be adopted.  People are used to the way they&#8217;ve worked before, or averse to risk.  So our transition toward better software is incremental &#8211; but it is happening.  Mainstream languages are offering higher-level concepts in their latest revisions.  Adding concepts like closures, type inference, and applicative libraries does the software industry a service.  It moves us toward a better way to write code.  Hopefully some day we&#8217;ll realize the low-level complexity we&#8217;ve dealt with isn&#8217;t really necessary and abandon it altogether.</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2007/06/03/why-are-we-so-polarized-about-java/">Why Are We So Polarized About Java?</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-06-03T11:38:05-05:00" pubdate data-updated="true">Jun 3<span>rd</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">It seems impossible to constructively praise or criticize Java without eliciting strong reactions.  It comes from both sides; some seem to love to hate Java, and parts of the Java community become defensive as a reaction.<br /><br />For example, Paul Buchheit recently <a title="posted some insights" href="http://paulbuchheit.blogspot.com/2007/05/amazingly-bad-apis.html">posted some insights</a> into API design, referring to poor examples that happen to be written in Java.  He immediately states he doesn&#8217;t hate Java.  The post is about APIs, not the language.  Even so, he still had to update his post saying &#8220;It&#8217;s not about Java, really&#8221;, presumably because of some polarized reactions.   This is unfortunate because it distracts us from Paul&#8217;s excellent commentary.<br /><br />I suspect the polarization starts from a trap I have fallen into myself.  Like many involved in language discussions, I use Java professionally and other languages at night, so I run into examples analogous to the one described by Paul Buchheit.  I sometimes get frustrated with poor APIs, and also with the Java language &#8211; either directly or by association with poor APIs.  I wonder, couldn&#8217;t it use powerful constructs I use in other languages, or could the APIs just plain be simpler?  <br /><br />The problem is my frustration may linger when I discuss programming languages, and (knowingly or unknowingly) be reflected in my tone when discussing Java.  The resulting post is more acidic, and less level handed than I would like.  Those who disagree with my arguments are likely to pick up on that tone and may respond in kind.  Before long we&#8217;ve spiraled into isolated camps, and meaningful discussion is hard to achieve.  My <a title="last post" href="http://toomuchcode.blogspot.com/2007/05/why-java-lost-its-mojo-and-what-sun-is.html">last post</a> had signs of this.<br /><br />So, where did I go wrong?  When discussing constructive criticism of Java and its APIs, we need to view Java with some perspective.  We need to remember its history.  So my first point is:<br /><blockquote><div style="text-align: left;"> </div><i>We are critical of Java in a context different from the one in which it was designed.</i></blockquote><i></i>  A key goal for Java was to replace C++, and this goal led to design decisions that are often targets for criticism today.  In 1996 it wasn&#8217;t clear we could create a sufficiently fast language without primitive types and arrays.  It wasn&#8217;t clear how much boilerplate code would be required by anonymous callback classes or checked exceptions.  It wasn&#8217;t clear that since the <i>new</i> syntax exactly specifies implementation, factory patterns would proliferate, and so on.  So my second point:<br /><div style="text-align: left;"><blockquote> <i>Criticisms of Java should not imply any negatives about the designers of Java.  Critics of Java are likely working in a problem space that differs from Java&#8217;s original design goals, or incorporating new knowledge from the past decade.</i></blockquote><i></i></div>  There are certainly some that disagreed with the above decisions in 1996, but it was surely more debatable then, and different decisions may have slowed Java&#8217;s proliferation &#8211; which was opposed to its original design goals.<br /><br />The key is we need to keep this background in mind whenever discussing Java.  We can criticize Java and its APIs without insulting anyone.  When being critical of Java, any frustrations should be tempered by knowing the landscape has changed.  Similarly, apologists should recognize that criticism need not be viewed as an attack; it might be an attempt to make things better.</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2007/06/02/why-java-lost-its-mojo%2C-and-what-sun-is-doing-about-it/">Why Java Lost Its Mojo, and What Sun Is Doing About It</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-06-02T08:36:30-05:00" pubdate data-updated="true">Jun 2<span>nd</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><span style="font-weight: bold;"></span>It&#8217;s old news to some, and hotly debated by others, but Java has lost its mojo.  The Java community still has growth from large companies, but it hasn&#8217;t been the darling language of hackers for a while (if it ever was).  But don&#8217;t think Sun isn&#8217;t doing anything about it.<br /><br />Java&#8217;s popularity is a function of market position, the perception of one product compared to its competitors.  When it first came out, Java was positioned against C++, to which it compares favorably.  Yes, I miss operator overloading and a handful of other items, but these are outweighed by the fact that Java prevents entire classes of errors made by C++ developers.  All of this was done before, but Sun was able to make it mainstream and practicable.<br /><br />Now the Java vs. C++ battle is effectively over.  Today Java&#8217;s market position is measured against a variety of languages, most frequently C#, Python, and Ruby.  For many of us, Java compares much less favorably to these than to C++.  Proponents of these languages love to show problems solved in a handful of lines, with a Java-based solution including dozens of lines of boilerplate code.  The poor Java developer is then pushed around and has his lunch money stolen.<br /><br />Naturally, much of the Java community wants to do something about this.  So <a title="closures" href="http://www.javac.info/">closures</a> and <a title="type inference" href="http://weblogs.java.net/blog/forax/archive/2006/12/call_me_santa.html">type inference</a> have been proposed for Java 7, and the debate in the Java community begins.  Some say &#8220;Hooray, Python programmers will stop making fun of me!&#8221;  Others object &#8220;Don&#8217;t we already have enough constructs to worry about in this language?&#8221;  Throw in the glacier-like JCP, and we have no idea what the next release of Java will look like.<br /><br /><span style="font-weight: bold;">Can we fix Java?</span><br />I am sympathetic to both arguments.  The language <span style="font-style: italic;">is</span> getting big.  If only we could get rid of artifacts like primitive types and arrays, we could remove clutter and make conceptual room for more advanced concepts.  Even so, I still land firmly in the pro-closure camp.  This is partially for selfish reasons; I got hooked on them while hacking in functional languages at night, and want to use them in my day job.  My company uses Java because it is actually the right choice for us.  No other platform offers that combination of portability, reliability, tooling, and performance.  Too bad it&#8217;s not with a better language.<br /><br />With this in mind, the rumblings of the last few years make sense, and the future is clear.   It&#8217;s not about Java at all, it&#8217;s about the JVM.  And Sun is positioning the JVM to become a light, efficient virtual machine available everywhere.  Consider everything that has happened:<br /><ul><li><a title="JavaFX" href="http://java.sun.com/javafx/">JavaFX</a> has been announced, creating a simple, declarative model to compete with the likes of Flex.</li><li>Sun has committed to releasing an update to Java 6 that will shrink the minimal JRE download to two megabytes.</li><li>Sun hired <a title="Charles Nutter" href="http://headius.blogspot.com/">Charles Nutter</a> to make JRuby a first-class language for the JVM.  The 1.0 release nears.<br /></li><li>Glassifish &#8211; the open-source application server sponsored by Sun &#8211; will run JRuby applications directly in v3, and be pluggable for new hosts.  Java SE and EE need never enter the picture.</li><li>The JVM is now available under the GPL, which should increase availability on Linux.</li><li>The 2007 JavaOne conference included a <a title="Scala" href="http://www.scala-lang.org/">Scala</a> session for the first time</li></ul>What does this tell us?  The JRE is becoming the new POSIX.  And the Java language is becoming less and less relevant.  (Can&#8217;t find where I first saw this idea posted&#8230;please send link if you have it.)<br /><span style="font-weight: bold;"><br /><span style="font-weight: bold;">But what about the mean time?</span></span><br />The reality is Java-the-language will be around for some time to come, at least until a clear successor is established.  Sun and other members of the JCP have an opportunity to define the language&#8217;s legacy.  As Guy Steele famously said, Java &#8220;managed to drag a lot of them [C++ programmers] about halfway to Lisp.&#8221;  Now Java can drag programmers one step closer to Lisp, and set the stage for the next generation of languages.<br /><br />Of course, I&#8217;m referring to closures.  Users of functional languages will attest how working with such constructs changes how you think.  By adding closures to Java, we do more than provide a powerful tool for those of us already familiar with the construct.  We introduce a large community to a better way of solving many problems.  We&#8217;ll see if it sticks, but I can&#8217;t think of a better way to spread a thought model many believe to be superior.<br /><br /><span style="font-weight: bold;">Update:</span>  I actually don&#8217;t think Java sucks.  It meets the early goal as a straightforward replacement for C++ very well.  I do believe we can create a language that is better than Java based on what we&#8217;ve learned over the last decade.</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2007/04/08/the-imaginary-concurrency-debate/">The Imaginary Concurrency Debate</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-04-08T16:01:32-05:00" pubdate data-updated="true">Apr 8<span>th</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">It&#8217;s finally being accepted: the shared memory, critical region model for concurrent programming is broken.   Even good programmers slip up and introduce race conditions, and bad programmers don&#8217;t even understand the semantics.  (You mean I have to lock an object just to <span style="font-style: italic;">read</span> its values?)<br /><br />The question is: how do we fix it?  Two proposals have drawn attention: The Actor/Message model and Software-Transactional Memory (STM).  The former eliminates shared state entirely, using messaging primitives for communication between threads, which may or may not be in the same process or physical machine.  The latter preserves shared memory, but each thread has a consistent view of shared state during an operation and makes updates atomically, much like a database transaction.  We&#8217;ll refer to these as the <a title="Erlang model" href="http://www-128.ibm.com/developerworks/java/library/j-cb04186.html?ca=drs">Erlang model</a> and the <a title="Haskell model (pdf)" href="http://research.microsoft.com/%7Esimonpj/papers/stm/stm.pdf">Haskell model (pdf)</a>, respectively, referring to the programming languages that most visibly use these synchronization techniques.<br /><br />A debate between these models has quietly arisen.  Proponents of the shared-nothing model point out the scalability and simplicity of Erlang.  Proponents of STM point out the composability of guaranteeing updates to two components can be made atomically.  Incredibly, it seems like this entire debate is ill-formed, and can be resolved with some simple generalization.<br /><br />First we realize nearly all non-trivial applications use both a form of messaging and shared resources.  A simple web application accepts messages from clients and shares state in a database.  Therefore, any widely used programming environment must offer first-class support for transacted resources <span style="font-style: italic;">and</span> messaging.<br /><br />Now, suppose we view transacted memory simply as a hidden optimization of a transacted resource.  In Erlang I can send messages to an Erlang process in the same physical address space or on a different machine &#8211; the former is simply a runtime optimization and not the concern of the developer.  STM is just a local optimization of a transacted resource; with abstraction we can also host the resource remotely like a database or distributed cache.<br /><br />In fact, the Erlang and Haskell models are closer than they first appear.  The STM proposal for Haskell has almost nothing to suggest a TVar must be locally hosted.  There are Erlang libraries allowing use of an RDBMS.   Both of these could be implementations of a general &#8220;transacted resource&#8221; API or Monad.  Similar parallels can be made for the messaging model.  Of course the languages have other significant differences, but these concepts are not so far apart.<br /><br />So where does this leave us in the concurrency debate?  I think we can draw some conclusions:<br /><ul><li>Today&#8217;s concurrency primitives can be abandoned, replaced by messaging and transacted resources</li><li>Messaging and shared resources are complementary constructs used in most applications</li><li>Shared memory is to transacted resources what in-process messaging is to general messaging: a hidden optimization</li><li>Applications should use messages, transactions, or an appropriate combination depending on their needs<br /> </li></ul>  Now we need to ask why no widespread language has yet to replace critical region primitives with messaging and transacted memory.  I think this is largely because such languages are hard to design.  Notice how I&#8217;m generalizing STM and transacted databases to the same concept, but they have very different usage patterns in practice.  It will be a challenge to design something this general yet simple enough so people will actually want to use it.  But I&#8217;m an optimist.<br /><br />One final note: both of these models are more easily implemented using a functional programming style.  Something as simple as immutable objects makes both local messaging and transactions much simpler and more efficient.  It&#8217;s funny how good practices pay off in ways we don&#8217;t expect.</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2007/02/26/imperfect-approximation-of-perfect-code/">Imperfect Approximation of Perfect Code</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-02-26T23:49:00-06:00" pubdate data-updated="true">Feb 26<span>th</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">It needs to be said: the quality of a programming language is not inversely proportional to the number of bytes needed for a Sudoku solver.  Not that there&#8217;s anything wrong with comparing Sudoku solvers; they can contrast certain aspects of languages, and differing solution styles can help readers think differently about code.  But this only gets us so far.<br /><br />The problem is the public language debate rarely ranges to topics that span more than a couple dozen lines of code.  Anything bigger is difficult to manage in a single discussion.  Therefore we need a model to debate the higher-order concerns of programming languages.  Fortunately, I&#8217;m shameless, and will shamelessly steal such a model from Donald Norman&#8217;s excellent <a href="http://mitpress.mit.edu/catalog/item/default.asp?tid=5393&ttype=2" title="Design of Everyday Things">Design of Everyday Things</a>.<br /><br />The idea I&#8217;m referring to is Norman&#8217;s modeling of human interaction with software and physical tools as a <span style="font-style: italic;">series of imperfect approximations to approach a perfect goal.</span>  A system should assume all user input is imperfect, but guide the user to her goal.  A user should have feedback indicating progress toward the goal.  Mistakes should be easily reversible and never take her far astray.<br /><br />Let&#8217;s apply this to programming languages and practices.  The biggest step forward in recent years has been the adoption of test-driven development.  This fits nicely &#8211; a solid safety net of unit tests allows developers to move towards the perfect goal.  It also brings to mind a humorous <a href="http://programmingkungfuqi.blogspot.com/2007/02/real-reason-why-building-software-is.html" title="recent post">recent post</a> by <span class="misspell" suggestions="Jet,Jot,Jut,Kt,Jct">Jt</span> Gleason.  One of the reasons programming is harder than bridge building is even small defects can cause us to jump radically away from our goal.<br /><br />So, what can improved languages and practices do to help?  They can guarantee no programmer mistake will cause us to jump to across an ocean, to use Gleason&#8217;s metaphor.  Programming will never be truly analogous to bridge building, but if bugs can be localized &#8211; like how a bad bolt is localized for a bridge &#8211; we might make progress.  We can&#8217;t eliminate bugs, but we can bound them and trend towards perfection.  This reminds me of a <span class="misspell" suggestions="Piety,Poet,PET,Pet,Pit">Piet</span> <span class="misspell" suggestions="He in,He-in,Heine,Hen,Heinz">Hein</span> poem reportedly displayed in Donald Knuth&#8217;s home:<br /><span style="font-style: italic;"></span><blockquote><span style="font-style: italic;"> The road to wisdom? Well, it&#8217;s plain<br /></span><span style="font-style: italic;"> And simple to express:</span><br /><span style="font-style: italic;"> Err</span><br /><span style="font-style: italic;"> and err</span><br /><span style="font-style: italic;"> and err again</span><br /><span style="font-style: italic;"> but less</span><br /><span style="font-style: italic;"> and less</span><br /><span style="font-style: italic;"> and less.</span></blockquote><span style="font-style: italic;"></span>  With all this in mind, I recently saw something that just might be a glimpse of the future.  Giles <span class="misspell" suggestions="Beckett,Becket,Bocked,Booked,Bucket">Bowkett</span> posted a <a href="http://gilesbowkett.blogspot.com/2007/01/seaside-screencasts.html" title="screencast"><span class="misspell" suggestions="screen cast,screen-cast,scrawniest,scroungiest,crankest">screencast</span></a> showing modification of code in a Seaside-based web application as it was running.  Sure, we&#8217;ve been able to hot-swap code for a while, but that&#8217;s usually a painful process requiring specific launch configuration and use of an external debugger.  Imagine if every menu in every program had an &#8220;edit&#8221; button available to experts, allowing them to adjust code on the fly.  The code-build-test-debug loop would become instantaneous, applications could be grown in the context of existing pieces, and good design and languages can prevent local bugs from creeping elsewhere.  This is our series of approximations toward a perfect goal.<br /><br />Of course, the above ideal might be unachievable for many applications.  Even so, it still might be possible to build an imperfect approximation.</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/3/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/17/clara-0-dot-5-released/">Clara 0.5 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/06/clara-0-dot-4-released/">Clara 0.4 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/19/rules-as-data/">Rules as Data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/">Crossing the (Data) Streams&#58; Scalable Realtime Processing With Rules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/24/rules-as-a-control-structure/">Rules as a Control Structure</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/rbrush">@rbrush</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'rbrush',
+            count: 4,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<section><h1>Twitter</h1>
+<a class="twitter-timeline" href="https://twitter.com/ryanbrush" data-widget-id="477774048554795009">Tweets by @ryanbrush</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ryan Brush -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

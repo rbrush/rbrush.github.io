@@ -1,0 +1,311 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Crossing the (data) streams&#58; scalable realtime processing with rules - Too Much Code</title>
+  <meta name="author" content="Ryan Brush">
+
+  
+  <meta name="description" content="Pipe-and-filter architectures are among the most successful design patterns ever. They dominate data ingestion and processing today, and give 1970&# &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Too Much Code" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-2927953-1']);
+    _gaq.push(['_setDomainName','toomuchcode.org']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Too Much Code</a></h1>
+  
+    <h2>Not enough cohesion</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.toomuchcode.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Crossing the (Data) Streams&#58; Scalable Realtime Processing With Rules</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2013-11-09T08:31:17-06:00" pubdate data-updated="true">Nov 9<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">Pipe-and-filter architectures are among the most successful design patterns ever. They dominate data ingestion and processing today, and give 1970&#8217;s hackers yet another chance to remind us how they thought of everything years ago.<br /><br />Unfortunately modern variations of this can run into an ugly problem: what are the semantics of a &#8220;join&#8221; operation between multiple infinite streams of data? Popular systems like Storm <a href="https://github.com/nathanmarz/storm/wiki/Common-patterns" target="_blank">point out this ambiguity</a>, <a href="http://samza.incubator.apache.org/learn/documentation/0.7.0/container/state-management.html" target="_blank">as does Samza</a>. Both provide primitives to support correlation of events between streams, but the higher-level semantics of a join are punted to the user.
+
+<br /><br />This is fine for such systems providing infrastructure, but is a troublesome model of our applications: if we can&#8217;t define clear and compelling semantics for a key part of our processing model, we might be using the wrong model. Projects like Storm offer an excellent infrastructure, but this ambiguity implies that many problems could be solved with a higher-level abstraction.<br /><br />The challenge with user-defined join semantics is it comes with baggage: maintaining state, structuring it, and recovering state after failure scenarios are challenging problems. It also makes the behavior of the system harder to understand. Since each join can have slightly different behavior, we need to look closely to see what&#8217;s going on. A better approach is needed. A set of simple yet flexible join operators would be ideal &#8211; so how do we get there?<br /><br />
+
+<blockquote class="tr_bq"><div style="text-align: center;"><span style="font-size: large;"><i>If we can&#8217;t define clear and compelling semantics for a key part of our processing model, we might be using the wrong model.</i></span></div></blockquote>
+
+We might consider CEP-style systems such as Esper and Drools Fusion, which have been tackling declarative-style joins for years. But such systems don&#8217;t offer the scalability or processing guarantees of Storm, and they use limited languages that aren&#8217;t always expressive enough for sophisticated logic.<br /><br />We need a data processing model with well-defined, declarative joins while supporting rich application logic. There are lots of options here, but here I&#8217;ll focus on one: suppose we could make&nbsp;<a href="http://www.toomuchcode.org/2013/09/rules-as-control-structure.html" target="_blank">rules as a control structure</a>&nbsp;scale linearly across a cluster, letting the rules engine distribute join operations. Let&#8217;s look at an experiment of making <a href="https://github.com/rbrush/clara-rules" target="_blank">Clara, a Clojure-based rules engine</a>, distribute its working memory and processing across a Storm cluster, with all of the scalability and processing guarantees of the underlying system.<br /><br /><h3>Forward-chaining rules on Storm</h3>Imagine a variant of the <a href="http://en.wikipedia.org/wiki/Rete_algorithm" target="_blank">Rete algorithm</a> implemented with some simple constraints:<br /><br />First, each condition in a rule can be evaluated independently, so incoming data can be spread across an arbitrary number of processes and match rule conditions appropriately.<br /><br />Second, aggregations over matched facts follow a map-and-reduce style pattern &#8211; where the map and partial reductions of aggregated facts can be done in parallel across machines.<br /><br />Finally, &#8220;joins&#8221; of aggregations or individual facts are always hash-based. So joins can be efficiently achieved by sending matched facts to the same node via their hash values.<br /><br />The result is our Storm topology looks something like this:<br /><br /><div class="separator" style="clear: both; text-align: center;"><a href="http://4.bp.blogspot.com/-f_frwIKZjko/Un0YiMW56jI/AAAAAAAAAIE/5GotL58ac28/s1600/clara-storm-diagram.png" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img border="0" height="210" src="http://4.bp.blogspot.com/-f_frwIKZjko/Un0YiMW56jI/AAAAAAAAAIE/5GotL58ac28/s320/clara-storm-diagram.png" width="320" /></a></div><div class="separator" style="clear: both; text-align: center;"><span style="text-align: left;"><br /></span></div><div class="separator" style="clear: both; text-align: justify;"><span style="text-align: left;">Let&#8217;s consider a simple example. Suppose we have feeds of temperature readings from multiple locations in some facility, and we want to take action in those locations should our readings exceed a threshold.</span></div><br />Each temperature reading has a logical timestamp, so since our logic is interested in the &#8220;newest&#8221; reading, we use a <a href="https://github.com/rbrush/clara-rules/wiki/Accumulators" target="_blank">Clara accumulator</a> that selects the item with the newest timestamp:
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">newest-temp</span> <span class="p">(</span><span class="nf">acc/max</span> <span class="ss">:timestamp</span> <span class="ss">:returns-fact</span> <span class="nv">true</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+We then use it in a rule that processes all our readings for a location and preserves the newest:
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nf">defrule</span> <span class="nv">get-current-temperature</span>
+</span><span class='line'>  <span class="s">&quot;Get the current temperature at a location by simply </span>
+</span><span class='line'><span class="s">   looking at the newest reading.&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">?current-temp</span> <span class="nv">&lt;-</span> <span class="nv">newest-temp</span> <span class="ss">:from</span> <span class="p">[</span><span class="nv">TemperatureReading</span> <span class="p">(</span><span class="nb">== </span><span class="nv">?location</span> <span class="nv">location</span><span class="p">)]]</span>
+</span><span class='line'>  <span class="nv">=&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">insert!</span> <span class="p">(</span><span class="nf">-&gt;CurrentTemperature</span> <span class="p">(</span><span class="ss">:value</span> <span class="nv">?current-temp</span><span class="p">)</span> <span class="nv">?location</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+Note that accumulators preserve minimal state and apply changes incrementally. In this case we keep only the current temperature based on timestamp; lower values are simply discarded, so we can deal with an infinite stream. &nbsp;Also, this example keeps the maximum, but we could easily accumulate some other value, such as a time-weighted histogram of temperatures to we&#8217;re robust to outliers. Any fact that doesn&#8217;t match a rule is simply discarded, incurring no further cost.<br /><br />Now that we have the current temperature for each location, we want to back off our devices in those locations if a threshold is exceeded. We can write this as a simple rule as well:
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nf">defrule</span> <span class="nv">reduce-device-speed</span>
+</span><span class='line'>  <span class="s">&quot;Reduce the speed of all devices in a location that has a high temperature.&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">CurrentTemperature</span> <span class="p">(</span><span class="nb">&gt; </span><span class="nv">value</span> <span class="nv">high-threshold</span><span class="p">)</span>
+</span><span class='line'>                      <span class="p">(</span><span class="nb">= </span><span class="nv">?location-id</span> <span class="nv">location</span><span class="p">)]</span>
+</span><span class='line'>  <span class="c1">;; Find all Device records in the location, and bind them to the ?device variable.</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">?device</span> <span class="nv">&lt;-</span> <span class="nv">Device</span> <span class="p">(</span><span class="nb">= </span><span class="nv">?location-id</span> <span class="nv">location</span><span class="p">)]</span>
+</span><span class='line'>  <span class="nv">=&gt;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">reduce-speed!</span> <span class="nv">?device</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+This first condition matches current temperatures that exceed the threshold, and binds it the ?location-id variable. &nbsp;The second condition finds all devices with a matching location, and binds them to the ?device variable. &nbsp;This is then visible on the right-hand side of the rule, where we can take action.<br /><br />This is effectively performing a join between temperatures that exceeded a threshold at a given location and devices in that same location. When running over Storm, this rule wish hash Device and CurrentTemperature facts and send them to the same processing using a hash value. This is done using Storm&#8217;s group-by field functionality over a data stream that connects each bolt instance together.<br /><br />All state for the join operations are managed internally by Clara&#8217;s engine. Accumulators like the example here compute in a rolling fashion, merging new data together, retracting previously accumulated values, and inserting new ones. Combined with rule engine-style truth maintenance, developers can simply declare their logic and let the engine maintain state and consistency.<br /><br /><h3>Integration with Processing Topologies</h3>The <a href="https://github.com/rbrush/clara-examples/blob/master/src/main/clojure/clara/examples/sensors.clj" target="_blank">rules used in this example are here</a>, and are run with the <a href="https://github.com/rbrush/clara-examples/blob/master/src/main/clojure/clara/examples/storm.clj" target="_blank">Storm launching code here</a>. There is also a draft <a href="https://github.com/rbrush/clara-storm/blob/master/src/main/java/clara/storm/RuleBolts.java" target="_blank">Java API to attach rules to a topology</a>. Note that our approach is to simply attach to a Storm topology defined via a provided TopologyBuilders, so users can pre-process or perform other logic in their topology, and route data as appropriate into the distributed rule engine. Also, these examples use Clojure records, but they can work equally well with Java objects, including ones generated by Thrift, Avro, or Protocol Buffers.<br /><br /><h3>Current State</h3>A prototype of rules over Storm is in the <a href="https://github.com/rbrush/clara-storm" target="_blank">clara-storm project</a>. It also includes the abilities to run queries across the rule engine&#8217;s working memory, using Storm&#8217;s Distributed RPC mechanism. A handful of things need to come together to make this production ready, inluding:<br /><br /><ul><li>I&#8217;d like input and suggestions from members of the Storm community. This topology layout isn&#8217;t an idiomatic use of Storm, so we need to ensure this won&#8217;t run into problems as we scale. &nbsp;(This is one of the reasons I&#8217;m posting this now.)</li><li>The <a href="https://github.com/rbrush/clara-rules/issues/16" target="_blank">ability to persist Clara&#8217;s working memory</a> to recover from machine failures. This will probably take the form of writing state changes for each rule node to reliable write-ahead log, with Kafka being a good storage mechanism.</li><li>Optimizations ranging from efficient serialization to doing partial aggregations prior to sharing state between bolts are needed.</li><li>Consider temporal operators in Clara. Accumulators have worked well to this point but may run into limits.</li><li>Testing at scale!</li></ul><div>The biggest takeaway is how technologies like Storm and Clojure provide an opportunity to express computation with higher-level abstractions. Things like <a href="https://blog.twitter.com/2013/streaming-mapreduce-with-summingbird" target="_blank">SummingBird</a>&nbsp;(and Cascalog 2.0?) offer ways to query data streams. These could be complemented by support for forward-chaining rules for problems easily expressed that way.</div></div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Ryan Brush</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2013-11-09T08:31:17-06:00" class="updated">Updated Nov 9<span>th</span>, 2013</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2013/09/24/rules-as-a-control-structure/" title="Previous Post: Rules as a Control Structure">&laquo; Rules as a Control Structure</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2014/01/19/rules-as-data/" title="Next Post: Rules as Data">Rules as Data &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/17/clara-0-dot-5-released/">Clara 0.5 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/06/clara-0-dot-4-released/">Clara 0.4 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/19/rules-as-data/">Rules as Data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/">Crossing the (Data) Streams&#58; Scalable Realtime Processing With Rules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/24/rules-as-a-control-structure/">Rules as a Control Structure</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/rbrush">@rbrush</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'rbrush',
+            count: 4,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<section><h1>Twitter</h1>
+<a class="twitter-timeline" href="https://twitter.com/ryanbrush" data-widget-id="477774048554795009">Tweets by @ryanbrush</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ryan Brush -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

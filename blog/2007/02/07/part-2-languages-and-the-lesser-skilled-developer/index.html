@@ -1,0 +1,264 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Part 2&#58; Languages and the Lesser-Skilled Developer - Too Much Code</title>
+  <meta name="author" content="Ryan Brush">
+
+  
+  <meta name="description" content="My last post ended with an assertion: we need a language with the best of Haskell in a more accessible form. This leads to an old debate. After all, &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/2007/02/07/part-2-languages-and-the-lesser-skilled-developer/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Too Much Code" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-2927953-1']);
+    _gaq.push(['_setDomainName','toomuchcode.org']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Too Much Code</a></h1>
+  
+    <h2>Not enough cohesion</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.toomuchcode.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Part 2&#58; Languages and the Lesser-Skilled Developer</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-02-07T01:18:14-06:00" pubdate data-updated="true">Feb 7<span>th</span>, 2007</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">My <a title="last post" href="http://toomuchcode.blogspot.com/2007/02/part-1-programming-and-metaphorical.html">last post</a> ended with an assertion: we need a language with the best of Haskell in a more accessible form.  This leads to an old debate.  After all, building good software requires tremendous skill.  How can we make progress if we tailor it to the weakest practitioners?  Bjarne Stroustrup <a href="http://www.technologyreview.com/Infotech/17868/page1/" title="made this point well">made this point well</a>:<br /><blockquote> The idea of programming as a semiskilled task, practiced by people with a few months&#8217; training, is dangerous. We wouldn&#8217;t tolerate plumbers or accountants that poorly educated. We don&#8217;t have as an aim that architecture (of buildings) and engineering (of bridges and trains) should become more accessible to people with progressively less training. Indeed, one serious problem is that currently, too <i>many</i> software developers are undereducated and undertrained.</blockquote>Stroupstrup is right, of course.  Too many developers <span style="font-style: italic;">are</span> undereducated; we <span style="font-style: italic;">should</span> demand greater skill.   However, this doesn&#8217;t change the fact that language adoption for a given shop has as much to do with politics as technical merit.  Businesses have a perceived need to hire armies of developers to quickly write bad code and bad software.  We&#8217;ll be asking &#8221;<a title="WTF" href="http://thedailywtf.com/">WTF</a>?&#8221; for a long time to come.<br /><br />The problem is highly skilled developers are often forced to use the languages accessible to their less competent colleagues.  Browse the forums at <a title="Reddit" href="http://reddit.com/">Reddit</a> and you&#8217;ll find lots of developers coding C# or Java by day and Haskell or Lisp by night.  In short, a language must be usable by lesser-skilled developers so high-skilled developers have more opportunities to use it.   Ruby is a great example of this in action &#8211; building a quick and dirty web application is trivial, but the language still offers powerful constructs such as closures.<br /><br /><span style="font-weight: bold;">Battling the Hack</span><br /><span style="font-weight: bold;"></span>Anyone who has written software for a couple years has come across the Nasty Hack &#8211; what should have been a simple piece of code made horribly complex, requiring an alignment of planets to work.  Languages such as Haskell have the laudable goal of <a title="preventing nasty hacks" href="http://neilbartlett.name/blog/?p=11">preventing nasty hacks</a> by <a title="restricting what can be done in a given context" href="http://syntaxfree.wordpress.com/2007/01/08/haskell-bondage-and-discipline-and-separation-of-concerns-programming/">restricting what can be done in a given context</a>.  Sadly, good design often takes second place to deadlines &#8211; and a language that has the appearance of slowing development won&#8217;t get far, even if it offers a net gain.<br /><br />Even a language that prevents some classes of nasty hacks will <a title="allow other kinds" href="http://trevion.blogspot.com/2006/11/functional-anti-patterns.html">allow others</a>.  No language will free us from bad code altogether.  Even worse, languages that free us from large classes of bad code have trouble getting adopted because businesses indirectly want to hack.  This has depressing implications:  the nasty hack is here to stay, and languages attempting to eliminate it will struggle to find widespread adoption.  Our only hope is a fundamental cultural change in the way most organizations build software.<br /><br />There is nothing I want to see more than this cultural shift.  Maybe some day the market will get so sick of bad software it will force change.  Consumers might realize great software<span style="font-style: italic;"> is </span>possible, as shown by a few innovative companies.   Other companies might finally delay entry to a market, knowing a buggy solution will be rejected.   The lesser-skilled developer might be forced to improve or leave the field.<br /><br />However, while attempting to change the culture we still need to innovate under the current constraints.  This means it must be easy to write quick and dirty code in a widely adopted language.  So I submit a requirement for our new language:<br /><span style="font-style: italic;"><blockquote>A language should encourage good code &#8211; but make quick and dirty code possible.</blockquote></span>Today languages like Ruby and Python are probably the closest to the mark.  Inexperienced developers can quickly get code working, and more advanced developers have access to powerful features drawn from the functional world.  However, both of these languages have shortcomings when compared to Haskell.  Incorrect code can lead to unpredictable behavior, and poorly designed code can lead to a state space too big for any human to understand.  Specifically, they do not offer a tractable solution to <a title="concurrency and composability" href="http://research.microsoft.com/%7Esimonpj/papers/stm/stm.pdf">concurrency and composability</a> (pdf).<br /><br />In my next post I will attempt to outline a language concept drawing from the best of Ruby, Haskell, and other sources.<br /><br />(Edit: fix typo)
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Ryan Brush</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+<time datetime="2007-02-07T01:18:14-06:00" class="updated">Updated Feb 7<span>th</span>, 2007</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2007/02/07/part-2-languages-and-the-lesser-skilled-developer/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2007/02/07/part-2-languages-and-the-lesser-skilled-developer/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2007/02/03/part-1-programming-and-the-metaphorical-mind/" title="Previous Post: Part 1&#58;  Programming and the Metaphorical Mind">&laquo; Part 1&#58;  Programming and the Metaphorical Mind</a>
+      
+      
+        <a class="basic-alignment right articlenav" href="/blog/2007/02/08/part-3-building-a-firewall-against-complexity/" title="Next Post: Part 3&#58; Building a Firewall Against Complexity">Part 3&#58; Building a Firewall Against Complexity &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/05/17/clara-0-dot-5-released/">Clara 0.5 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/06/clara-0-dot-4-released/">Clara 0.4 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/19/rules-as-data/">Rules as Data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/">Crossing the (Data) Streams&#58; Scalable Realtime Processing With Rules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/24/rules-as-a-control-structure/">Rules as a Control Structure</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/rbrush">@rbrush</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'rbrush',
+            count: 4,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<section><h1>Twitter</h1>
+<a class="twitter-timeline" href="https://twitter.com/ryanbrush" data-widget-id="477774048554795009">Tweets by @ryanbrush</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ryan Brush -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
