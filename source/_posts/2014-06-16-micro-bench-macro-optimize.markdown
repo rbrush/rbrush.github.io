@@ -140,3 +140,5 @@ In short, the trouble with benchmarks is they encourage treating symptoms rather
 All optimizations discussed here are in master and will be released in Clara 0.6.0 this summer. You can see some current comparisons with Drools in the [clara-benchmark project](https://github.com/rbrush/clara-benchmark). There are still opportunities for improvement in Clara, being a relatively new system. Probably the next significant optimization is greater laziness, [which we're tracking here](https://github.com/rbrush/clara-rules/issues/58). 
 
 Updates will be posted here and on [my twitter feed](https://twitter.com/ryanbrush). I'll also be discussing modern approaches to expert systems, including Clara, at two conferences over the next few months: [Midwest.io](http://www.midwest.io) in July and [strangeloop](https://thestrangeloop.com) in September. 
+
+Discussion of this post can be [done on Hacker News](https://news.ycombinator.com/item?id=7898448).
