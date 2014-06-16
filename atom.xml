@@ -4,7 +4,7 @@
   <title><![CDATA[Too Much Code]]></title>
   <link href="http://www.toomuchcode.org/atom.xml" rel="self"/>
   <link href="http://www.toomuchcode.org/"/>
-  <updated>2014-06-16T06:50:00-05:00</updated>
+  <updated>2014-06-16T10:25:13-05:00</updated>
   <id>http://www.toomuchcode.org/</id>
   <author>
     <name><![CDATA[Ryan Brush]]></name>
@@ -92,7 +92,7 @@
 
 <p>The trouble I ran into with my benchmarks is that I had many items mapping to the same key. Notice that Clojure&rsquo;s group-by uses a transient map, but that map contains non-transient vectors. So the performance bottleneck arose because this group-by function wasn&rsquo;t &ldquo;transient enough&rdquo; for my particular data.</p>
 
-<p>I worked around this by writing an alternate group-by that better fit my needs. It&rsquo;s internals are hideous but are the result of profiling a couple implementations:</p>
+<p>I worked around this by writing an alternate group-by that better fit my needs. Its internals are hideous but are the result of profiling a couple implementations:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -141,7 +141,7 @@
 
 <h3>Referential Transparency Breeds Serendipity</h3>
 
-<p>Writing functional code tends to create please surprises. We come across significant advantages that wouldn&rsquo;t be possible with a different approach.. Considering the following Clara example and it&rsquo;s Drools equivalent:</p>
+<p>Writing functional code tends to create pleasant surprises. We come across significant advantages that wouldn&rsquo;t be possible with a different approach. Considering the following Clara example and it&rsquo;s Drools equivalent:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
