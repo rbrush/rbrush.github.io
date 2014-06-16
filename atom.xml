@@ -4,7 +4,7 @@
   <title><![CDATA[Too Much Code]]></title>
   <link href="http://www.toomuchcode.org/atom.xml" rel="self"/>
   <link href="http://www.toomuchcode.org/"/>
-  <updated>2014-06-16T10:31:37-05:00</updated>
+  <updated>2014-06-16T10:54:24-05:00</updated>
   <id>http://www.toomuchcode.org/</id>
   <author>
     <name><![CDATA[Ryan Brush]]></name>
@@ -40,7 +40,7 @@
 
 <h3>Strongly Isolated Mutability</h3>
 
-<p>A better algorithm got us close, but Clara further profiling revealed a bottleneck for some use cases. Rete engines often perform joins over common facts, like this simple example:</p>
+<p>A better algorithm got us close, but further profiling revealed a bottleneck for some use cases. Rete engines often perform joins over common facts, like this simple example:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
