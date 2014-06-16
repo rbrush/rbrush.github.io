@@ -4,7 +4,7 @@
   <title><![CDATA[Too Much Code]]></title>
   <link href="http://www.toomuchcode.org/atom.xml" rel="self"/>
   <link href="http://www.toomuchcode.org/"/>
-  <updated>2014-06-16T10:25:13-05:00</updated>
+  <updated>2014-06-16T10:31:37-05:00</updated>
   <id>http://www.toomuchcode.org/</id>
   <author>
     <name><![CDATA[Ryan Brush]]></name>
@@ -28,7 +28,7 @@
 
 <h2>Optimizing Clojure Code</h2>
 
-<p>Optimizations should have an objective. My objective with Clara was to make performance at least competitive with latest version of Drools, which may be used to solve similar problems. Clara&rsquo;s basis in Clojure offers a number of advantages and need to make sure performance isn&rsquo;t a barrier. So I created the <a href="https://github.com/rbrush/clara-benchmark">clara-benchmark</a> project, using <a href="https://github.com/hugoduncan/criterium">Criterium</a> to benchmark a number of flows in both Clara and Drools. Some findings:</p>
+<p>Optimizations should have an objective. My objective with Clara was to make performance at least competitive with latest version of Drools, which may be used to solve similar problems. Clara&rsquo;s basis in Clojure offers a number of advantages, but we need to make sure performance isn&rsquo;t a barrier. So I created the <a href="https://github.com/rbrush/clara-benchmark">clara-benchmark</a> project, using <a href="https://github.com/hugoduncan/criterium">Criterium</a> to benchmark a number of flows in both Clara and Drools. Some findings:</p>
 
 <h3>It&rsquo;s All About the Algorithms</h3>
 
