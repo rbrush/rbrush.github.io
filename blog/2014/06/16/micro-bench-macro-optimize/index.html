@@ -1,0 +1,457 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Micro Benchmarks versus Macro Optimizations in Clojure - Too Much Code</title>
+  <meta name="author" content="Ryan Brush">
+
+  
+  <meta name="description" content="Here&rsquo;s a simple question Clojure users hear often: What is the overhead of Clojure&rsquo;s persistent data structures? I ran into this question &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/2014/06/16/micro-bench-macro-optimize/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Too Much Code" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-2927953-1']);
+    _gaq.push(['_setDomainName','toomuchcode.org']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Too Much Code</a></h1>
+  
+    <h2>Not enough cohesion</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.toomuchcode.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Micro Benchmarks versus Macro Optimizations in Clojure</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-06-16T07:00:00-05:00" pubdate data-updated="true">Jun 16<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Here&rsquo;s a simple question Clojure users hear often:</p>
+
+<blockquote><p>What is the overhead of Clojure&rsquo;s persistent data structures?</p></blockquote>
+
+<p>I ran into this question headlong when profiling and tuning <a href="https://github.com/rbrush/clara-rules">Clara</a>. Clara aims to draw ideas from expert systems into the Clojure ecosystem, making them available as first-class Clojure idioms. Therefore Clara&rsquo;s working memory works like other Clojure data structures: it is immutable and &ldquo;updates&rdquo; create a new, immutable working memory.</p>
+
+<p>Anyone skeptical of the benefits of immutability should go watch Rich Hickey&rsquo;s talks like <a href="http://www.infoq.com/presentations/Simple-Made-Easy">Simple Made Easy</a>. Yet these advantages are irrelevant if they don&rsquo;t perform well enough. So we have a challenge: we know that persistent Clojure structures will lose a micro benchmark comparison to mutable counterparts, but can we balance that with macro optimizations made possible with immutability? The answer is <em>yes</em>, with the techniques below working for Clara and probably for many other projects.</p>
+
+<h2>Optimizing Clojure Code</h2>
+
+<p>Optimizations should have an objective. My objective with Clara was to make performance at least competitive with latest version of Drools, which may be used to solve similar problems. Clara&rsquo;s basis in Clojure offers a number of advantages and need to make sure performance isn&rsquo;t a barrier. So I created the <a href="https://github.com/rbrush/clara-benchmark">clara-benchmark</a> project, using <a href="https://github.com/hugoduncan/criterium">Criterium</a> to benchmark a number of flows in both Clara and Drools. Some findings:</p>
+
+<h3>It&rsquo;s All About the Algorithms</h3>
+
+<p>The first run of profiling didn&rsquo;t look good. Clara was most ten times slower than Drools for some cases. But it turns out the bulk of this cost had nothing to do with Clojure &mdash; my variation of the Rete algorithm was inefficient, indexing facts for join operations that could never occur due to the nature of the rules. In short, my algorithm sucked.</p>
+
+<p>The good news this was easily exposed with a profiling tool and fixed with little effort. I find algorithms in a language like Clojure to be easier to understand and tune because they are expressed as simple transformations of data. We know the structures we receive and return, and simply need to identify the most efficient way to express the transformation. This is a major contrast to systems that force us keep track of a bunch of additional state when working through the system.</p>
+
+<p>A better algorithm was the biggest single improvement, bringing Clara within twice Drools performance or better for the use cases tested. But we&rsquo;re not done yet.</p>
+
+<h3>Strongly Isolated Mutability</h3>
+
+<p>A better algorithm got us close, but Clara further profiling revealed a bottleneck for some use cases. Rete engines often perform joins over common facts, like this simple example:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">defquery</span> <span class="nv">orders-by-customer-id</span>
+</span><span class='line'>  <span class="s">&quot;Returns the orders for the given customer.&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:?id</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">Order</span> <span class="p">(</span><span class="nb">= </span><span class="nv">?id</span> <span class="nv">customerId</span><span class="p">)</span> <span class="p">(</span><span class="nb">= </span><span class="nv">?total</span> <span class="nv">total</span><span class="p">)]</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">Customer</span> <span class="p">(</span><span class="nb">= </span><span class="nv">?id</span> <span class="nv">id</span><span class="p">)])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This queries the working memory to simply find customer and orders with the same id. (See the <a href="https://github.com/rbrush/clara-rules/wiki/Guide">Clara documentation</a> for details on use.)</p>
+
+<p>Clara makes extensive use of Clojure&rsquo;s <code>group-by</code> function to group collections of facts by matching keys. After tuning my algorithm, I discovered that some benchmarks were spending the bulk of their time in <code>group-by</code>. The <code>group-by</code> implementation can be found in <a href="https://github.com/clojure/clojure/blob/master/src/clj/clojure/core.clj">the Clojure source</a>, but here it is for convenience:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">group-by</span>
+</span><span class='line'>  <span class="s">&quot;Returns a map of the elements of coll keyed by the result of</span>
+</span><span class='line'><span class="s">  f on each element. The value at each key will be a vector of the</span>
+</span><span class='line'><span class="s">  corresponding elements, in the order they appeared in coll.&quot;</span>
+</span><span class='line'>  <span class="p">{</span><span class="ss">:added</span> <span class="s">&quot;1.2&quot;</span>
+</span><span class='line'>   <span class="ss">:static</span> <span class="nv">true</span><span class="p">}</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">f</span> <span class="nv">coll</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">persistent!</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">reduce</span>
+</span><span class='line'>    <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">ret</span> <span class="nv">x</span><span class="p">]</span>
+</span><span class='line'>      <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">k</span> <span class="p">(</span><span class="nf">f</span> <span class="nv">x</span><span class="p">)]</span>
+</span><span class='line'>        <span class="p">(</span><span class="nf">assoc!</span> <span class="nv">ret</span> <span class="nv">k</span> <span class="p">(</span><span class="nb">conj </span><span class="p">(</span><span class="nb">get </span><span class="nv">ret</span> <span class="nv">k</span> <span class="p">[])</span> <span class="nv">x</span><span class="p">))))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">transient</span> <span class="p">{})</span> <span class="nv">coll</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Notice the use of Clojure transients, which are mutable structures designed to be used locally for efficiency. Clojure takes a pragmatic step here. The goal is to keep our systems easy to reason about, and we can achieve that if no external observer can detect mutability. <code>group-by</code> is a pure function working with immutable structures for all observers, but gains performance by using transients internally.</p>
+
+<p>The trouble I ran into with my benchmarks is that I had many items mapping to the same key. Notice that Clojure&rsquo;s group-by uses a transient map, but that map contains non-transient vectors. So the performance bottleneck arose because this group-by function wasn&rsquo;t &ldquo;transient enough&rdquo; for my particular data.</p>
+
+<p>I worked around this by writing an alternate group-by that better fit my needs. It&rsquo;s internals are hideous but are the result of profiling a couple implementations:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">tuned-group-by</span>
+</span><span class='line'>  <span class="s">&quot;Equivalent of the built-in group-by, but tuned for when </span>
+</span><span class='line'><span class="s">   there are many values per key.&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">f</span> <span class="nv">coll</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">-&gt;&gt;</span> <span class="nv">coll</span>
+</span><span class='line'>       <span class="c1">;; Create a mutable map of transient vectors.</span>
+</span><span class='line'>       <span class="p">(</span><span class="nb">reduce </span><span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nb">map </span><span class="nv">value</span><span class="p">]</span>
+</span><span class='line'>                 <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">k</span> <span class="p">(</span><span class="nf">f</span> <span class="nv">value</span><span class="p">)</span>
+</span><span class='line'>                       <span class="nv">items</span> <span class="p">(</span><span class="nb">or </span><span class="p">(</span><span class="nf">.get</span> <span class="o">^</span><span class="nv">java.util.HashMap</span> <span class="nb">map </span><span class="nv">k</span><span class="p">)</span>
+</span><span class='line'>                                 <span class="p">(</span><span class="nf">transient</span> <span class="p">[]))]</span>
+</span><span class='line'>                   <span class="p">(</span><span class="nf">.put</span> <span class="o">^</span><span class="nv">java.util.HashMap</span> <span class="nb">map </span><span class="nv">k</span> <span class="p">(</span><span class="nf">conj!</span> <span class="nv">items</span> <span class="nv">value</span><span class="p">)))</span>
+</span><span class='line'>                 <span class="nv">map</span><span class="p">)</span>
+</span><span class='line'>               <span class="p">(</span><span class="nf">java.util.HashMap.</span><span class="p">))</span>
+</span><span class='line'>      <span class="c1">;; Make the vectors immutable into a transient map.</span>
+</span><span class='line'>      <span class="p">(</span><span class="nb">reduce </span><span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nb">map </span><span class="p">[</span><span class="nb">key </span><span class="nv">value</span><span class="p">]]</span>
+</span><span class='line'>                  <span class="p">(</span><span class="nf">assoc!</span> <span class="nb">map key </span><span class="p">(</span><span class="nf">persistent!</span> <span class="nv">value</span><span class="p">)))</span>
+</span><span class='line'>                <span class="p">(</span><span class="nf">transient</span> <span class="p">{}))</span>
+</span><span class='line'>      <span class="c1">;; Make the map itself immutable.</span>
+</span><span class='line'>      <span class="p">(</span><span class="nf">persistent!</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is more efficient when there are many items that map to the same key in the returned map, since it uses transient values. (The Java HashMap turned out to be the fastest option to build the result here, but it never escapes this function.) This optimization cut some benchmark times in half. Combined with a number of smaller tweaks, this brought most of Clara&rsquo;s use cases inline with Drools performance. For other use cases Clara significantly outperforms Drools, but we&rsquo;ll get to those later.</p>
+
+<p>My <code>tuned-group-by</code> function is faster than Clojure&rsquo;s <code>group-by</code> for some inputs and slower for others. But this misses a bigger advantage: <strong><em>Clojure&rsquo;s philosophy of separating functions and data made swapping implementations trivial, allowing users to pick the right ones for their specific needs.</em></strong> This isn&rsquo;t so easily done if functions are strongly tied to the data they work with, which is an easy pitfall of object-oriented programming.</p>
+
+<h3>Referential Transparency Breeds Serendipity</h3>
+
+<p>Writing functional code tends to create please surprises. We come across significant advantages that wouldn&rsquo;t be possible with a different approach.. Considering the following Clara example and it&rsquo;s Drools equivalent:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="kd">ns </span><span class="nv">clara.benchmark.visit-order-same-day</span>
+</span><span class='line'>  <span class="p">(</span><span class="ss">:require</span> <span class="p">[</span><span class="nv">clara.rules</span> <span class="ss">:refer</span> <span class="ss">:all</span><span class="p">]</span>
+</span><span class='line'>            <span class="p">[</span><span class="nv">clj-time.coerce</span> <span class="ss">:as</span> <span class="nv">coerce</span><span class="p">])</span>
+</span><span class='line'>  <span class="p">(</span><span class="ss">:import</span> <span class="p">[</span><span class="nv">clara.benchmark.beans</span> <span class="nv">Order</span> <span class="nv">Visit</span><span class="p">]))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="nf">defquery</span> <span class="nv">same-day-visit</span>
+</span><span class='line'>   <span class="s">&quot;Queries orders that occurred the same day as a visit.&quot;</span>
+</span><span class='line'>   <span class="p">[]</span>
+</span><span class='line'>   <span class="p">[</span><span class="nv">Order</span> <span class="p">(</span><span class="nb">= </span><span class="nv">?id</span> <span class="nv">customerId</span><span class="p">)</span> <span class="p">(</span><span class="nb">= </span><span class="nv">?day</span> <span class="p">(</span><span class="nf">coerce/to-local-date</span> <span class="nv">time</span><span class="p">))]</span>
+</span><span class='line'>   <span class="p">[</span><span class="nv">Visit</span> <span class="p">(</span><span class="nb">= </span><span class="nv">?id</span> <span class="nv">customerId</span><span class="p">)</span> <span class="p">(</span><span class="nb">= </span><span class="nv">?day</span> <span class="p">(</span><span class="nf">coerce/to-local-date</span> <span class="nv">time</span><span class="p">))])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Drools equivalent:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">clara</span><span class="o">.</span><span class="na">benchmark</span><span class="o">.</span><span class="na">drools</span><span class="o">.</span><span class="na">visit_order_same_day</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">clara.benchmark.beans.Order</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">clara.benchmark.beans.Visit</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.joda.time.DateTime</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">query</span> <span class="s">&quot;same_day_visit&quot;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="n">Order</span><span class="o">(</span><span class="n">$id</span> <span class="o">:</span> <span class="n">customerId</span><span class="o">,</span> <span class="n">$day</span> <span class="o">:</span> <span class="n">time</span><span class="o">.</span><span class="na">toLocalDate</span><span class="o">())</span>
+</span><span class='line'>   <span class="n">Visit</span><span class="o">(</span><span class="n">$id</span> <span class="o">==</span> <span class="n">customerId</span><span class="o">,</span> <span class="n">$day</span> <span class="o">==</span> <span class="n">time</span><span class="o">.</span><span class="na">toLocalDate</span><span class="o">())</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>These rules simply identify things happening on the same day. Yet there is a big difference: Drools does an O(n<sup>2</sup>) Cartesian join where Clara does an O(n*log<sub>32</sub>n) indexed join of each item. Therefore Clara becomes dramatically faster than Drools for large inputs in this case. Also notice how Clara cleanly integrates with Clojure&rsquo;s syntax, as opposed to embedding multiple syntaxes into a file, since it treats <a href="http://www.toomuchcode.org/blog/2013/09/24/rules-as-a-control-structure/">rules as a control structure</a>.</p>
+
+<p>This is possible because of Clojure&rsquo;s emphasis on pure, referentially transparent functions. Since we can replace the function call with its result, we can build an index of that result. The outcome is a significantly more efficient system for this class of problem.</p>
+
+<p>Along the same lines, rule engines facilities to reason over sets of facts can be implemented more efficiently under these constraints. Clara&rsquo;s equivalent of Jess and Drools <em>accumulators</em> simply compile into Clojure <a href="http://clojure.org/reducers">reducers</a>, making them more efficient than the alternatives by simply tapping into that feature.</p>
+
+<p>These advantages arise often: we can defer computation to efficient batch operations. We can transparently spread work across threads without dealing with lock-based concurrency. We can memoize functions or build efficient caches based on fast reference comparison. Importantly, when starting a problem it&rsquo;s not always obvious how these advantages will arise, but these techniques provide an opportunity for great optimizations at the macro level. David Nolen&rsquo;s <a href="http://swannodette.github.io/2013/12/17/the-future-of-javascript-mvcs/">work on Om</a> is a dramatic example of this in action.</p>
+
+<h2>The Trouble with Benchmarks</h2>
+
+<p>X is faster than Y makes for a great incendiary headline on Hacker News, but it doesn&rsquo;t really make sense. X may be faster than Y for workload Z with trade offs A, B, and C&hellip;but for some reason those headlines don&rsquo;t get as many upvotes.</p>
+
+<p>Benchmarks are informative and an important tool to improve our system. But they aren&rsquo;t a real measure of a system&rsquo;s quality or potential. A better measure is how easily a system can be understood, adapted, and expanded. If we can <em>understand</em> the nature of a problem, performance or otherwise, we can usually fix it. Clojure simply provides better mechanisms to understand and improve our systems than other languages I&rsquo;ve used.</p>
+
+<p>In short, the trouble with benchmarks is they encourage treating symptoms rather the than the explosion of complexity that limits what we can build.</p>
+
+<h2>Clara&rsquo;s Future</h2>
+
+<p>All optimizations discussed here are in master and will be released in Clara 0.6.0 this summer. You can see some current comparisons with Drools in the <a href="https://github.com/rbrush/clara-benchmark">clara-benchmark project</a>. There are still opportunities for improvement in Clara, being a relatively new system. Probably the next significant optimization is greater laziness, <a href="https://github.com/rbrush/clara-rules/issues/58">which we&rsquo;re tracking here</a>.</p>
+
+<p>Updates will be posted here and on <a href="https://twitter.com/ryanbrush">my twitter feed</a>. I&rsquo;ll also be discussing modern approaches to expert systems, including Clara, at two conferences over the next few months: <a href="http://www.midwest.io">Midwest.io</a> in July and <a href="https://thestrangeloop.com">strangeloop</a> in September.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Ryan Brush</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-06-16T07:00:00-05:00" pubdate data-updated="true">Jun 16<span>th</span>, 2014</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2014/06/16/micro-bench-macro-optimize/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2014/06/16/micro-bench-macro-optimize/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2014/05/17/clara-0-dot-5-released/" title="Previous Post: Clara 0.5 Released">&laquo; Clara 0.5 Released</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/06/16/micro-bench-macro-optimize/">Micro Benchmarks versus Macro Optimizations in Clojure</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/05/17/clara-0-dot-5-released/">Clara 0.5 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/06/clara-0-dot-4-released/">Clara 0.4 Released</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/19/rules-as-data/">Rules as Data</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/">Crossing the (data) streams&#58; scalable realtime processing with rules</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/rbrush">@rbrush</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'rbrush',
+            count: 4,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+<section><h1>Twitter</h1>
+<a class="twitter-timeline" href="https://twitter.com/ryanbrush" data-widget-id="477774048554795009">Tweets by @ryanbrush</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ryan Brush -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
