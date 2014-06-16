@@ -124,7 +124,7 @@
 
 <h3>It&rsquo;s All About the Algorithms</h3>
 
-<p>The first run of profiling didn&rsquo;t look good. Clara was most ten times slower than Drools for some cases. But it turns out the bulk of this cost had nothing to do with Clojure &mdash; my variation of the Rete algorithm was inefficient, indexing facts for join operations that could never occur due to the nature of the rules. In short, my algorithm sucked.</p>
+<p>The first run of profiling didn&rsquo;t look good. Clara was almost ten times slower than Drools for some cases. But it turns out the bulk of this cost had nothing to do with Clojure &mdash; my variation of the Rete algorithm was inefficient, indexing facts for join operations that could never occur due to the nature of the rules. In short, my algorithm sucked.</p>
 
 <p>The good news this was easily exposed with a profiling tool and fixed with little effort. I find algorithms in a language like Clojure to be easier to understand and tune because they are expressed as simple transformations of data. We know the structures we receive and return, and simply need to identify the most efficient way to express the transformation. This is a major contrast to systems that force us keep track of a bunch of additional state when working through the system.</p>
 
