@@ -10,9 +10,9 @@ Here's a simple question Clojure users hear often:
 
 > What is the overhead of Clojure's persistent data structures?
 
-I ran into this question headlong when profiling and tuning [Clara](https://github.com/rbrush/clara-rules). Clara aims to draw ideas in expert systems into the Clojure ecosystem, making them available as first-class Clojure idioms. Therefore Clara's working memory works like other Clojure data structures: it is immutable, with "updates" resulting in a new, immutable memory and the previous one unchanged. 
+I ran into this question headlong when profiling and tuning [Clara](https://github.com/rbrush/clara-rules). Clara aims to draw ideas from expert systems into the Clojure ecosystem, making them available as first-class Clojure idioms. Therefore Clara's working memory works like other Clojure data structures: it is immutable and "updates" create a new, immutable working memory.
 
-Anyone skeptical of the benefits of immutability should go watch Rich Hickey's talks like [Simple Made Easy](http://www.infoq.com/presentations/Simple-Made-Easy). Yet these advantages are irrelevant if they don't perform well. So we have a challenge: we know that Clojure structures will lose a micro benchmark comparison to mutable counterparts, but can we balance that with macro optimizations made possible with immutability? The answer is _yes_, with the techniques below working for Clara and probably applicable to many projects.
+Anyone skeptical of the benefits of immutability should go watch Rich Hickey's talks like [Simple Made Easy](http://www.infoq.com/presentations/Simple-Made-Easy). Yet these advantages are irrelevant if they don't perform well enough. So we have a challenge: we know that persistent Clojure structures will lose a micro benchmark comparison to mutable counterparts, but can we balance that with macro optimizations made possible with immutability? The answer is _yes_, with the techniques below working for Clara and probably for many other projects.
 
 ## Optimizing Clojure Code
 Optimizations should have an objective. My objective with Clara was to make performance at least competitive with latest version of Drools, which may be used to solve similar problems. Clara's basis in Clojure offers a number of advantages and need to make sure performance isn't a barrier. So I created the [clara-benchmark](https://github.com/rbrush/clara-benchmark) project, using [Criterium](https://github.com/hugoduncan/criterium) to benchmark a number of flows in both Clara and Drools. Some findings:
@@ -20,7 +20,7 @@ Optimizations should have an objective. My objective with Clara was to make perf
 ### It's All About the Algorithms
 The first run of profiling didn't look good. Clara was most ten times slower than Drools for some cases. But it turns out the bulk of this cost had nothing to do with Clojure -- my variation of the Rete algorithm was inefficient, indexing facts for join operations that could never occur due to the nature of the rules. In short, my algorithm sucked.
 
-The good news this was easily exposed with a profiling tool and fixed with little effort. I find algorithms in a language like Clojure to be much easier to understand and tune because they are expressed as simple transformations of data. We know the structure we receive and what we should return, and simply need to identify the most efficient way of implementing the transformation. This can be challenging or impossible when attempting to track an explosion of possible states. 
+The good news this was easily exposed with a profiling tool and fixed with little effort. I find algorithms in a language like Clojure to be easier to understand and tune because they are expressed as simple transformations of data. We know the structures we receive and return, and simply need to identify the most efficient way to express the transformation. This is a major contrast to systems that force us keep track of a bunch of additional state when working through the system. 
 
 A better algorithm was the biggest single improvement, bringing Clara within twice Drools performance or better for the use cases tested. But we're not done yet.
 
@@ -83,7 +83,7 @@ I worked around this by writing an alternate group-by that better fit my needs. 
       (persistent!)))
 ```
 
-This is more efficient when there are many items that map to the same key in the returned map, since it uses transient values. This optimization, and a number of smaller tweaks, brought most of Clara's use cases inline with Drools performance. For other use cases Clara significantly outperforms Drools, but we'll get to those later. 
+This is more efficient when there are many items that map to the same key in the returned map, since it uses transient values. (The Java HashMap turned out to be the fastest option to build the result here, but it never escapes this function.) This optimization cut some benchmark times in half. Combined with a number of smaller tweaks, this brought most of Clara's use cases inline with Drools performance. For other use cases Clara significantly outperforms Drools, but we'll get to those later. 
 
 My ```tuned-group-by``` function is faster than Clojure's ```group-by``` for some inputs and slower for others. But this misses a bigger advantage: **_Clojure's philosophy of separating functions and data made swapping implementations trivial, allowing users to pick the right ones for their specific needs._** This isn't so easily done if functions are strongly tied to the data they work with, which is an easy pitfall of object-oriented programming.
 
@@ -125,6 +125,8 @@ These rules simply identify things happening on the same day. Yet there is a big
 
 This is possible because of Clojure's emphasis on pure, referentially transparent functions. Since we can replace the function call with its result, we can build an index of that result. The outcome is a significantly more efficient system for this class of problem.
 
+Along the same lines, rule engines facilities to reason over sets of facts can be implemented more efficiently under these constraints. Clara's equivalent of Jess and Drools _accumulators_ simply compile into Clojure [reducers](http://clojure.org/reducers), making them more efficient than the alternatives by simply tapping into that feature.
+
 These advantages arise often: we can defer computation to efficient batch operations. We can transparently spread work across threads without dealing with lock-based concurrency. We can memoize functions or build efficient caches based on fast reference comparison. Importantly, when starting a problem it's not always obvious how these advantages will arise, but these techniques provide an opportunity for great optimizations at the macro level. David Nolen's [work on Om](http://swannodette.github.io/2013/12/17/the-future-of-javascript-mvcs/) is a dramatic example of this in action.
 
 ## The Trouble with Benchmarks
@@ -132,9 +134,9 @@ X is faster than Y makes for a great incendiary headline on Hacker News, but it 
 
 Benchmarks are informative and an important tool to improve our system. But they aren't a real measure of a system's quality or potential. A better measure is how easily a system can be understood, adapted, and expanded. If we can _understand_ the nature of a problem, performance or otherwise, we can usually fix it. Clojure simply provides better mechanisms to understand and improve our systems than other languages I've used.
 
-In short, the trouble with benchmarks is they encourage treating symptoms rather the than the systemic complexity that limits what we can build.
+In short, the trouble with benchmarks is they encourage treating symptoms rather the than the explosion of complexity that limits what we can build.
 
 ## Clara's Future
-All optimizations discussed here are in master and will be released in Clara 0.6.0 this summer. There are still opportunities for improvement in Clara, being a relatively new system. Probably the next significant step is greater laziness, [which we're tracking here](https://github.com/rbrush/clara-rules/issues/58). 
+All optimizations discussed here are in master and will be released in Clara 0.6.0 this summer. You can see some current comparisons with Drools in the [clara-benchmark project](https://github.com/rbrush/clara-benchmark). There are still opportunities for improvement in Clara, being a relatively new system. Probably the next significant optimization is greater laziness, [which we're tracking here](https://github.com/rbrush/clara-rules/issues/58). 
 
-I'll be discussing modern approaches to rules engines, including Clara, at two conferences over the next few months: [Midwest.io](http://www.midwest.io) in July and [strangeloop](https://thestrangeloop.com) in September. I'll be happy to discuss these topics there, and can also be reached via twitter as [@ryanbrush](https://twitter.com/ryanbrush).
+Updates will be posted here and on [my twitter feed](https://twitter.com/ryanbrush). I'll also be discussing modern approaches to expert systems, including Clara, at two conferences over the next few months: [Midwest.io](http://www.midwest.io) in July and [strangeloop](https://thestrangeloop.com) in September. 
