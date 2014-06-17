@@ -15,7 +15,7 @@ I ran into this question headlong when profiling and tuning [Clara](https://gith
 Anyone skeptical of the benefits of immutability should go watch Rich Hickey's talks like [Simple Made Easy](http://www.infoq.com/presentations/Simple-Made-Easy). Yet these advantages are irrelevant if they don't perform well enough. So we have a challenge: we know that persistent Clojure structures will lose a micro benchmark comparison to mutable counterparts, but can we balance that with macro optimizations made possible with immutability? The answer is _yes_, with the techniques below working for Clara and probably for many other projects.
 
 ## Optimizing Clojure Code
-Optimizations should have an objective. My objective with Clara was to make performance at least competitive with latest version of Drools, which may be used to solve similar problems. Clara's basis in Clojure offers a number of advantages and need to make sure performance isn't a barrier. So I created the [clara-benchmark](https://github.com/rbrush/clara-benchmark) project, using [Criterium](https://github.com/hugoduncan/criterium) to benchmark a number of flows in both Clara and Drools. Some findings:
+Optimizations should have an objective. My objective with Clara was to make performance at least competitive with latest version of Drools, which may be used to solve similar problems. Clara's basis in Clojure offers a number of advantages, but we need to make sure performance isn't a barrier. So I created the [clara-benchmark](https://github.com/rbrush/clara-benchmark) project, using [Criterium](https://github.com/hugoduncan/criterium) to benchmark a number of flows in both Clara and Drools. Some findings:
 
 ### It's All About the Algorithms
 The first run of profiling didn't look good. Clara was almost ten times slower than Drools for some cases. But it turns out the bulk of this cost had nothing to do with Clojure -- my variation of the Rete algorithm was inefficient, indexing facts for join operations that could never occur due to the nature of the rules. In short, my algorithm sucked.
@@ -25,7 +25,7 @@ The good news this was easily exposed with a profiling tool and fixed with littl
 A better algorithm was the biggest single improvement, bringing Clara within twice Drools performance or better for the use cases tested. But we're not done yet.
 
 ### Strongly Isolated Mutability
-A better algorithm got us close, but Clara further profiling revealed a bottleneck for some use cases. Rete engines often perform joins over common facts, like this simple example:
+A better algorithm got us close, but further profiling revealed a bottleneck for some use cases. Rete engines often perform joins over common facts, like this simple example:
 
 ```clj
 (defquery orders-by-customer-id
@@ -59,7 +59,7 @@ Notice the use of Clojure transients, which are mutable structures designed to b
 
 The trouble I ran into with my benchmarks is that I had many items mapping to the same key. Notice that Clojure's group-by uses a transient map, but that map contains non-transient vectors. So the performance bottleneck arose because this group-by function wasn't "transient enough" for my particular data.
 
-I worked around this by writing an alternate group-by that better fit my needs. It's internals are hideous but are the result of profiling a couple implementations:
+I worked around this by writing an alternate group-by that better fit my needs. Its internals are hideous but are the result of profiling a couple implementations:
 
 ```clj
 (defn tuned-group-by
@@ -88,7 +88,7 @@ This is more efficient when there are many items that map to the same key in the
 My ```tuned-group-by``` function is faster than Clojure's ```group-by``` for some inputs and slower for others. But this misses a bigger advantage: **_Clojure's philosophy of separating functions and data made swapping implementations trivial, allowing users to pick the right ones for their specific needs._** This isn't so easily done if functions are strongly tied to the data they work with, which is an easy pitfall of object-oriented programming.
 
 ### Referential Transparency Breeds Serendipity
-Writing functional code tends to create please surprises. We come across significant advantages that wouldn't be possible with a different approach.. Considering the following Clara example and it's Drools equivalent:
+Writing functional code tends to create pleasant surprises. We come across significant advantages that wouldn't be possible with a different approach. Considering the following Clara example and it's Drools equivalent:
 
 ```clj
 (ns clara.benchmark.visit-order-same-day
@@ -140,5 +140,3 @@ In short, the trouble with benchmarks is they encourage treating symptoms rather
 All optimizations discussed here are in master and will be released in Clara 0.6.0 this summer. You can see some current comparisons with Drools in the [clara-benchmark project](https://github.com/rbrush/clara-benchmark). There are still opportunities for improvement in Clara, being a relatively new system. Probably the next significant optimization is greater laziness, [which we're tracking here](https://github.com/rbrush/clara-rules/issues/58). 
 
 Updates will be posted here and on [my twitter feed](https://twitter.com/ryanbrush). I'll also be discussing modern approaches to expert systems, including Clara, at two conferences over the next few months: [Midwest.io](http://www.midwest.io) in July and [strangeloop](https://thestrangeloop.com) in September. 
-
-Discussion of this post can be [done on Hacker News](https://news.ycombinator.com/item?id=7898448).
