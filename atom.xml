@@ -4,7 +4,7 @@
   <title><![CDATA[Too Much Code]]></title>
   <link href="http://www.toomuchcode.org/atom.xml" rel="self"/>
   <link href="http://www.toomuchcode.org/"/>
-  <updated>2014-06-16T10:54:24-05:00</updated>
+  <updated>2014-06-17T06:18:17-05:00</updated>
   <id>http://www.toomuchcode.org/</id>
   <author>
     <name><![CDATA[Ryan Brush]]></name>
@@ -218,8 +218,6 @@
 <p>All optimizations discussed here are in master and will be released in Clara 0.6.0 this summer. You can see some current comparisons with Drools in the <a href="https://github.com/rbrush/clara-benchmark">clara-benchmark project</a>. There are still opportunities for improvement in Clara, being a relatively new system. Probably the next significant optimization is greater laziness, <a href="https://github.com/rbrush/clara-rules/issues/58">which we&rsquo;re tracking here</a>.</p>
 
 <p>Updates will be posted here and on <a href="https://twitter.com/ryanbrush">my twitter feed</a>. I&rsquo;ll also be discussing modern approaches to expert systems, including Clara, at two conferences over the next few months: <a href="http://www.midwest.io">Midwest.io</a> in July and <a href="https://thestrangeloop.com">strangeloop</a> in September.</p>
-
-<p>Discussion of this post can be <a href="https://news.ycombinator.com/item?id=7898448">done on Hacker News</a>.</p>
 ]]></content>
   </entry>
   
