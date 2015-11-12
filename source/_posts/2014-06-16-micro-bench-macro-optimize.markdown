@@ -3,7 +3,7 @@ layout: post
 title: "Micro Benchmarks versus Macro Optimizations in Clojure"
 date: 2014-06-16 07:00:00 -0500
 comments: true
-categories: 
+categories:
 ---
 
 Here's a simple question Clojure users hear often:
@@ -20,7 +20,7 @@ Optimizations should have an objective. My objective with Clara was to make perf
 ### It's All About the Algorithms
 The first run of profiling didn't look good. Clara was almost ten times slower than Drools for some cases. But it turns out the bulk of this cost had nothing to do with Clojure -- my variation of the Rete algorithm was inefficient, indexing facts for join operations that could never occur due to the nature of the rules. In short, my algorithm sucked.
 
-The good news this was easily exposed with a profiling tool and fixed with little effort. I find algorithms in a language like Clojure to be easier to understand and tune because they are expressed as simple transformations of data. We know the structures we receive and return, and simply need to identify the most efficient way to express the transformation. This is a major contrast to systems that force us keep track of a bunch of additional state when working through the system. 
+The good news this was easily exposed with a profiling tool and fixed with little effort. I find algorithms in a language like Clojure to be easier to understand and tune because they are expressed as simple transformations of data. We know the structures we receive and return, and simply need to identify the most efficient way to express the transformation. This is a major contrast to systems that force us keep track of a bunch of additional state when working through the system.
 
 A better algorithm was the biggest single improvement, bringing Clara within twice Drools performance or better for the use cases tested. But we're not done yet.
 
@@ -40,7 +40,7 @@ This queries the working memory to simply find customer and orders with the same
 Clara makes extensive use of Clojure's ```group-by``` function to group collections of facts by matching keys. After tuning my algorithm, I discovered that some benchmarks were spending the bulk of their time in ```group-by```. The ```group-by``` implementation can be found in [the Clojure source](https://github.com/clojure/clojure/blob/master/src/clj/clojure/core.clj), but here it is for convenience:
 
 ```clj
-(defn group-by 
+(defn group-by
   "Returns a map of the elements of coll keyed by the result of
   f on each element. The value at each key will be a vector of the
   corresponding elements, in the order they appeared in coll."
@@ -63,7 +63,7 @@ I worked around this by writing an alternate group-by that better fit my needs. 
 
 ```clj
 (defn tuned-group-by
-  "Equivalent of the built-in group-by, but tuned for when 
+  "Equivalent of the built-in group-by, but tuned for when
    there are many values per key."
   [f coll]
   (->> coll
@@ -83,7 +83,7 @@ I worked around this by writing an alternate group-by that better fit my needs. 
       (persistent!)))
 ```
 
-This is more efficient when there are many items that map to the same key in the returned map, since it uses transient values. (The Java HashMap turned out to be the fastest option to build the result here, but it never escapes this function.) This optimization cut some benchmark times in half. Combined with a number of smaller tweaks, this brought most of Clara's use cases inline with Drools performance. For other use cases Clara significantly outperforms Drools, but we'll get to those later. 
+This is more efficient when there are many items that map to the same key in the returned map, since it uses transient values. (The Java HashMap turned out to be the fastest option to build the result here, but it never escapes this function.) This optimization cut some benchmark times in half. Combined with a number of smaller tweaks, this brought most of Clara's use cases inline with Drools performance. For other use cases Clara significantly outperforms Drools, but we'll get to those later.
 
 My ```tuned-group-by``` function is faster than Clojure's ```group-by``` for some inputs and slower for others. But this misses a bigger advantage: **_Clojure's philosophy of separating functions and data made swapping implementations trivial, allowing users to pick the right ones for their specific needs._** This isn't so easily done if functions are strongly tied to the data they work with, which is an easy pitfall of object-oriented programming.
 
@@ -137,6 +137,6 @@ Benchmarks are informative and an important tool to improve our system. But they
 In short, the trouble with benchmarks is they encourage treating symptoms rather the than the explosion of complexity that limits what we can build.
 
 ## Clara's Future
-All optimizations discussed here are in master and will be released in Clara 0.6.0 this summer. You can see some current comparisons with Drools in the [clara-benchmark project](https://github.com/rbrush/clara-benchmark). There are still opportunities for improvement in Clara, being a relatively new system. Probably the next significant optimization is greater laziness, [which we're tracking here](https://github.com/rbrush/clara-rules/issues/58). 
+All optimizations discussed here are in master and will be released in Clara 0.6.0 this summer. You can see some current comparisons with Drools in the [clara-benchmark project](https://github.com/rbrush/clara-benchmark). There are still opportunities for improvement in Clara, being a relatively new system. Probably the next significant optimization is greater laziness, [which we're tracking here](https://github.com/rbrush/clara-rules/issues/58).
 
-Updates will be posted here and on [my twitter feed](https://twitter.com/ryanbrush). I'll also be discussing modern approaches to expert systems, including Clara, at two conferences over the next few months: [Midwest.io](http://www.midwest.io) in July and [strangeloop](https://thestrangeloop.com) in September. 
+Updates will be posted here and on [my twitter feed](https://twitter.com/ryanbrush). I'll also be discussing modern approaches to expert systems, including Clara, at two conferences over the next few months: [Midwest.io](http://www.midwest.io) in July and [strangeloop](https://thestrangeloop.com) in September.

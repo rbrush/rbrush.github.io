@@ -1,0 +1,12 @@
+[submodule "themes/blodandblue"]
+	path = themes/blodandblue
+	url = https://github.com/johnkeith/boldandblue
+[submodule "themes/boldandblue"]
+	path = themes/boldandblue
+	url = https://github.com/johnkeith/boldandblue
+[submodule ".themes/boldandblue"]
+	path = .themes/boldandblue
+	url = https://github.com/johnkeith/boldandblue
+[submodule ".themes/whitespace"]
+	path = .themes/whitespace
+	url = https://github.com/lucaslew/whitespace
