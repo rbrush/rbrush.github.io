@@ -4,7 +4,7 @@
   <title><![CDATA[Too Much Code]]></title>
   <link href="http://www.toomuchcode.org/atom.xml" rel="self"/>
   <link href="http://www.toomuchcode.org/"/>
-  <updated>2015-11-11T23:51:24-06:00</updated>
+  <updated>2015-11-12T00:36:05-06:00</updated>
   <id>http://www.toomuchcode.org/</id>
   <author>
     <name><![CDATA[Ryan Brush]]></name>
@@ -125,7 +125,7 @@
 <span class='line-number'>18</span>
 <span class='line-number'>19</span>
 </pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">tuned-group-by</span>
-</span><span class='line'>  <span class="s">&quot;Equivalent of the built-in group-by, but tuned for when </span>
+</span><span class='line'>  <span class="s">&quot;Equivalent of the built-in group-by, but tuned for when</span>
 </span><span class='line'><span class="s">   there are many values per key.&quot;</span>
 </span><span class='line'>  <span class="p">[</span><span class="nv">f</span> <span class="nv">coll</span><span class="p">]</span>
 </span><span class='line'>  <span class="p">(</span><span class="nf">-&gt;&gt;</span> <span class="nv">coll</span>
