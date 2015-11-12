@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>The real reason we need strongly-typed languages - Too Much Code</title>
+  <title>Beware of the Flying Car - Too Much Code</title>
   <meta name="author" content="Ryan Brush">
 
   
-  <meta name="description" content="There aren&#8217;t many hard-and-fast facts about software, but here&#8217;s one: The more code you have, the more bugs you have.More formally, lines &hellip;">
+  <meta name="description" content="Every so often we developers are asked to build a flying car. Our users obviously need one to avoid traffic and get to meetings on time. So we set &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.toomuchcode.org/blog/2006/11/14/the-real-reason-we-need-strongly-typed-languages/">
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/2010/10/17/beware-of-the-flying-car/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -83,7 +83,7 @@
   <header>
     
       
-        <h1 class="entry-title">The real reason we need strongly-typed languages</h1>
+        <h1 class="entry-title">Beware of the Flying Car</h1>
       
     
     
@@ -102,14 +102,14 @@
 
 
   
-<time datetime="2006-11-14T23:07:03-06:00" pubdate data-updated="true">Nov 14<span>th</span>, 2006</time>
+<time datetime="2010-10-17T03:20:51Z" pubdate data-updated="true">Oct 17<span>th</span>, 2010</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content">There aren&#8217;t many hard-and-fast facts about software, but here&#8217;s one:<br /><br />    The more code you have, the more bugs you have.<br /><br />More formally, lines of code is a strong predictor of defects.  So, any language that allows you to do the same work with less code must be a Good Thing.  This is why Python is better than Java is better than C++ is better than assembly, right?<br /><br />Well, almost.  The standard counter argument is strongly-typed languages catch mistakes at compile time that slip to run time for dynamic languages.   I don&#8217;t buy this argument, because  even though it will catch <span style="font-style: italic;">some</span> mistakes, there are so many other errors to be made you still need to unit test the code.  And good unit tests will catch the same errors of strongly-typed languages.  Okay, so a lot of people don&#8217;t write good unit tests, but until they do they&#8217;re beyond our help anyway.  As Bruce Eckel said, <a href="http://www.mindview.net/WebLog/log-0025" title="if it's not tested, it's broken">&#8220;if it&#8217;s not tested, it&#8217;s broken&#8221;</a>.<br /><br />So why am I a proponent of strongly-typed languages for many (but not all) problem sets?  Because they give us one thing dynamic languages by definition never will: unambiguous, guaranteed documentation.   Building large software systems means interfacing with subsystems written by others, and they must be documented.  Strongly-typed languages have an important part of that documentation built in: they precisely define the input and output types of each procedure call.  An API in a dynamic language needs the same documentation anyway, so why provide the chance for error?  Even for well-documented libraries, the reduced amount of code in the dynamic language is balanced by increased documentation.<br /><br />In fact, I&#8217;d like to see languages with even stronger guarantees.  A <a href="http://nice.sourceforge.net/language.html" title="Nice">Nice</a> addition to Java would be to define references that can never be null.  Many times I&#8217;ve used an API and asked, &#8220;do I need to check for null?&#8221;  The answer to my question should be part of the API itself.<br /><br />Of course, specific dynamic languages may have other advantages over their strongly-typed counterparts.  Also, some programs may not need the detailed level of documentation offered by strong typing.  Even so, type definitions are a key part of the documentation needed for a large system.</div>
+<div class="entry-content"><div style="margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; background-color: transparent; font-family: Times; font-size: medium; "><span id="internal-source-marker_0.4220108645968139" style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Every so often we developers are asked to build a flying car. Our users obviously need one to avoid traffic and get to meetings on time. So we set down the path to meet those needs.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">The trouble is most of us have no idea how to build a flying car. Even so, this is the project so we better get started! Our first release of the flying car will be small, and carried around on a string. We show good progress to our user&#8217;s needs and gain approval from our superiors. We will simply remove the string in a later release.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Hopefully most of us will recognize a Flying Car Project and take time to understand and address the users’ goals rather than sprinting toward a brick wall.  The Flying Car is a means, not an end in itself &#8211; and there are other, executable means to the desired end.  </span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Of course, there will always be </span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">someone</span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "> eager to go build that flying car.  If that happens, try to steer them in the right direction.  If all else fails, just don’t be standing underneath it when they cut the string.</span><br /></div></div>
 
 
   <footer>
@@ -133,7 +133,7 @@
 
 
   
-<time datetime="2006-11-14T23:07:03-06:00" class="updated">Updated Nov 14<span>th</span>, 2006</time>
+<time datetime="2010-10-17T03:20:51Z" class="updated">Updated Oct 17<span>th</span>, 2010</time>
       
 
 
@@ -141,7 +141,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2006/11/14/the-real-reason-we-need-strongly-typed-languages/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2006/11/14/the-real-reason-we-need-strongly-typed-languages/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2010/10/17/beware-of-the-flying-car/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2010/10/17/beware-of-the-flying-car/" >Tweet</a>
   
   
   
@@ -150,8 +150,10 @@
     
     <p class="meta">
       
+        <a class="basic-alignment left articlenav" href="/blog/2010/10/16/and-were-back/" title="Previous Post: And We're Back">&laquo; And We're Back</a>
       
-        <a class="basic-alignment right articlenav" href="/blog/2006/12/26/the-software-engineers-new-clothes/" title="Next Post: The Software Engineer's New Clothes">The Software Engineer's New Clothes &raquo;</a>
+      
+        <a class="basic-alignment right articlenav" href="/blog/2010/10/19/can-agile-in-the-large-succeed/" title="Next Post: Can "Agile in the Large" Succeed?">Can "Agile in the Large" Succeed? &raquo;</a>
       
     </p>
   </footer>
@@ -164,6 +166,10 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/11/11/clara-rules-site/">Clara Rules Site</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/06/16/micro-bench-macro-optimize/">Micro Benchmarks versus Macro Optimizations in Clojure</a>
@@ -179,10 +185,6 @@
     
       <li class="post">
         <a href="/blog/2014/01/19/rules-as-data/">Rules as Data</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/11/09/crossing-the-data-streams-scalable-realtime-processing-with-rules/">Crossing the (data) streams&#58; scalable realtime processing with rules</a>
       </li>
     
   </ul>
@@ -230,7 +232,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Ryan Brush -
+  Copyright &copy; 2015 - Ryan Brush -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

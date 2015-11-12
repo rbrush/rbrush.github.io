@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>What we can learn from databases - Too Much Code</title>
+  <title>The real reason we need strongly-typed languages - Too Much Code</title>
   <meta name="author" content="Ryan Brush">
 
   
-  <meta name="description" content="While not perfect, relational databases are among the most successful software ever used. Their behavior is easily understood even under high &hellip;">
+  <meta name="description" content="There aren&#8217;t many hard-and-fast facts about software, but here&#8217;s one: The more code you have, the more bugs you have.More formally, lines &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.toomuchcode.org/blog/2007/12/26/what-we-can-learn-from-databases/">
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/2006/11/15/the-real-reason-we-need-strongly-typed-languages/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -83,7 +83,7 @@
   <header>
     
       
-        <h1 class="entry-title">What we can learn from databases</h1>
+        <h1 class="entry-title">The real reason we need strongly-typed languages</h1>
       
     
     
@@ -102,14 +102,14 @@
 
 
   
-<time datetime="2007-12-26T18:19:04Z" pubdate data-updated="true">Dec 26<span>th</span>, 2007</time>
+<time datetime="2006-11-15T05:07:03Z" pubdate data-updated="true">Nov 15<span>th</span>, 2006</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content">While not perfect, relational databases are among the most successful software ever used.  Their behavior is easily understood even under high concurrency. Sets of changes can be composed with almost no effort, with strong guarantees of consistency.  The question is: would this be true if we built our databases the same way we build applications?<br /><br />Transactions and read consistency would be the first to go.  Users must then cooperatively synchronize on some external monitor; any failure to do so can result in invalid data.  Next, system state and logic become intermixed.  Gone are simple ways to inspect the state of the system, or create a well-defined state space with known transitions.  In short, if databases were written like applications, they become vulnerable to all of the bugs we see in applications.<br /><br />Suppose we turn the question on its head, and ask what characteristics of the database we can apply to the rest of software?  Consider the following advantages:<br /><ul><li>The system itself guarantees a consistent view of data under concurrency, eliminating many types of race conditions</li><li>State changes are composable; updates are committed atomically, ensuring the database is never in an invalid state.<br /></li><li>The state space is understandable.  Because updates are composed to an atomic state change, countless permutations of state are eliminated</li></ul>The key is this: we can confidently inspect, reason about, and change the state space of a database.  The complexity of large models is mitigated by allowing only for valid, composable transitions.  Imagine if we had such guarantees when building software in general.  We could understand the state of an application at any time, and ensure all changes are valid and consistent.  Our system would be much more understandable and predictable.<br /><br />In fact, much language research is focused on this area.  <a title="Software-Transactional Memory" href="http://research.microsoft.com/%7Esimonpj/papers/stm/stm.pdf" id="r1g6">Software Transactional Memory</a> in languages like Haskell is the most visible.  The question is how such progress will reach the mainstream.  History suggests an evolutionary model.  Languages that gain adoption tend to have a good deal in common with an established language, lowering the barrier to entry.  Because of this, I have yet to see a language with the above characteristics that I think will achieve widespread adoption.  Hopefully that will change.<br /><br /><b>Understandable systems today<br /></b>A couple of <a title="recent" href="http://steve-yegge.blogspot.com/2007/12/codes-worst-enemy.html" id="b02u">recent</a> <a title="posts" href="http://www.codinghorror.com/blog/archives/001025.html" id="pqvj">posts</a> point out the burden of large code bases.  I agree, as suggested by the title of this blog, but it&#8217;s easy to confuse a symptom with the problem itself.  So I phrase it differently:  Unmanageable complexity is the enemy.  Code size is often what the enemy smells like.<br /><br />Developers can better manage complexity even without guarantees similar to what a database offers.  Code should have a clear, easily understood state space, preferably applying related changes atomically.  Such systems are easier to reason about and change because developers need not concern themselves with side effects of unrelated code; they can focus on the problem at hand.  For those who haven&#8217;t explored this, I&#8217;m indirectly describing the functional style of programming.  This is the great hope for pure functional programming: it may spread predictability and a simple model to all development.</div>
+<div class="entry-content">There aren&#8217;t many hard-and-fast facts about software, but here&#8217;s one:<br /><br />    The more code you have, the more bugs you have.<br /><br />More formally, lines of code is a strong predictor of defects.  So, any language that allows you to do the same work with less code must be a Good Thing.  This is why Python is better than Java is better than C++ is better than assembly, right?<br /><br />Well, almost.  The standard counter argument is strongly-typed languages catch mistakes at compile time that slip to run time for dynamic languages.   I don&#8217;t buy this argument, because  even though it will catch <span style="font-style: italic;">some</span> mistakes, there are so many other errors to be made you still need to unit test the code.  And good unit tests will catch the same errors of strongly-typed languages.  Okay, so a lot of people don&#8217;t write good unit tests, but until they do they&#8217;re beyond our help anyway.  As Bruce Eckel said, <a href="http://www.mindview.net/WebLog/log-0025" title="if it's not tested, it's broken">&#8220;if it&#8217;s not tested, it&#8217;s broken&#8221;</a>.<br /><br />So why am I a proponent of strongly-typed languages for many (but not all) problem sets?  Because they give us one thing dynamic languages by definition never will: unambiguous, guaranteed documentation.   Building large software systems means interfacing with subsystems written by others, and they must be documented.  Strongly-typed languages have an important part of that documentation built in: they precisely define the input and output types of each procedure call.  An API in a dynamic language needs the same documentation anyway, so why provide the chance for error?  Even for well-documented libraries, the reduced amount of code in the dynamic language is balanced by increased documentation.<br /><br />In fact, I&#8217;d like to see languages with even stronger guarantees.  A <a href="http://nice.sourceforge.net/language.html" title="Nice">Nice</a> addition to Java would be to define references that can never be null.  Many times I&#8217;ve used an API and asked, &#8220;do I need to check for null?&#8221;  The answer to my question should be part of the API itself.<br /><br />Of course, specific dynamic languages may have other advantages over their strongly-typed counterparts.  Also, some programs may not need the detailed level of documentation offered by strong typing.  Even so, type definitions are a key part of the documentation needed for a large system.</div>
 
 
   <footer>
@@ -133,7 +133,7 @@
 
 
   
-<time datetime="2007-12-26T18:19:04Z" class="updated">Updated Dec 26<span>th</span>, 2007</time>
+<time datetime="2006-11-15T05:07:03Z" class="updated">Updated Nov 15<span>th</span>, 2006</time>
       
 
 
@@ -141,7 +141,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2007/12/26/what-we-can-learn-from-databases/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2007/12/26/what-we-can-learn-from-databases/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2006/11/15/the-real-reason-we-need-strongly-typed-languages/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2006/11/15/the-real-reason-we-need-strongly-typed-languages/" >Tweet</a>
   
   
   
@@ -150,10 +150,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left articlenav" href="/blog/2007/11/04/the-design-crisis/" title="Previous Post: The Design Crisis">&laquo; The Design Crisis</a>
       
-      
-        <a class="basic-alignment right articlenav" href="/blog/2008/01/07/end-of-softwares-dark-age/" title="Next Post: End of software's dark age?">End of software's dark age? &raquo;</a>
+        <a class="basic-alignment right articlenav" href="/blog/2006/12/26/the-software-engineers-new-clothes/" title="Next Post: The Software Engineer's New Clothes">The Software Engineer's New Clothes &raquo;</a>
       
     </p>
   </footer>
