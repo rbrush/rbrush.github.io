@@ -1,0 +1,646 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Insta-Declarative DSLs! - Too Much Code</title>
+  <meta name="author" content="Ryan Brush">
+
+  
+  <meta name="description" content="Recently I&rsquo;ve focused on retaking rules for developers, where rules aim to be a developer-friendly way to untagle complex logic. Yet some &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.toomuchcode.org/blog/2015/11/14/insta-declarative-dsls">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Too Much Code" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=Fjalla+One" rel="stylesheet" type="text/css">
+<!--- MathJax Configuration -->
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-2927953-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+
+</head>
+
+<body   class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Too Much Code</a></h1>
+  
+    <h2>Not enough cohesion</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscribe" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS" target="_blank"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25" height="25" viewbox="0 0 100 100"><path class="social" d="M 13.310204,73.332654 C 5.967347,73.332654 0,79.322448 0,86.621428 c 0,7.338776 5.967347,13.262246 13.310204,13.262246 7.370408,0 13.328572,-5.92245 13.328572,-13.262246 0,-7.29898 -5.958164,-13.288774 -13.328572,-13.288774 z M 0.01530612,33.978572 V 53.143878 C 12.493878,53.143878 24.229592,58.02347 33.068368,66.865306 41.894898,75.685714 46.767346,87.47449 46.767346,100 h 19.25 C 66.017346,63.592858 36.4,33.979592 0.01530612,33.978572 l 0,0 z M 0.03877552,0 V 19.17449 C 44.54796,19.17551 80.77551,55.437756 80.77551,100 H 100 C 100,44.87653 55.15102,0 0.03877552,0 z"></path></svg></a></li>
+  
+</ul>
+  
+  
+  
+  
+  
+<ul class="subscribe">
+  <li><a href="https://github.com/rbrush" rel="subscribe-github" title="@rbrush on GitHub" target="_blank"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25" height="25" viewbox="0 0 100 100"><path class="social" d="M 50,0 C 22.385714,0 0,22.385714 0,50 0,77.614286 22.385714,100 50,100 77.614286,100 100,77.614286 100,50 100,22.385714 77.614286,0 50,0 z m 29.692858,79.692858 c -3.859184,3.859182 -8.351022,6.887754 -13.35,9.00306 -1.27041,0.536736 -2.560204,1.009184 -3.867348,1.415306 v -7.493878 c 0,-3.938774 -1.35102,-6.835714 -4.053062,-8.690816 1.692858,-0.163264 3.24694,-0.390816 4.663266,-0.683672 1.416326,-0.292858 2.913266,-0.716328 4.491838,-1.27041 1.57857,-0.55408 2.994896,-1.213264 4.247958,-1.97755 1.253062,-0.765306 2.458164,-1.758164 3.613266,-2.978572 1.155102,-1.220408 2.12449,-2.604082 2.905102,-4.15 0.780612,-1.545918 1.4,-3.40204 1.855102,-5.566326 0.455102,-2.164286 0.683674,-4.54898 0.683674,-7.153062 0,-5.045918 -1.643878,-9.341836 -4.931634,-12.890816 C 77.44796,33.35 77.285714,29.10204 75.463266,24.512244 l -1.22143,-0.145918 c -0.845918,-0.09796 -2.368366,0.260204 -4.565306,1.07449 -2.196938,0.814286 -4.663264,2.14796 -7.396938,4.004082 -3.87449,-1.07449 -7.893878,-1.611224 -12.061224,-1.611224 -4.19898,0 -8.203062,0.536734 -12.012246,1.611224 -1.72449,-1.17245 -3.361224,-2.139796 -4.907142,-2.905102 C 31.753062,25.77449 30.516326,25.254082 29.587756,24.97653 28.660204,24.7 27.79796,24.528572 27,24.463266 c -0.79796,-0.0653 -1.310204,-0.08062 -1.537756,-0.04898 -0.22755,0.03164 -0.390816,0.0653 -0.487754,0.09796 -1.82347,4.62245 -1.985714,8.87143 -0.487756,12.743878 -3.287754,3.54796 -4.931632,7.844898 -4.931632,12.890816 0,2.604082 0.227552,4.988776 0.683674,7.153062 0.456122,2.164286 1.07449,4.020408 1.855102,5.566326 0.780612,1.545918 1.75,2.929592 2.905102,4.15 1.155102,1.220408 2.360204,2.213266 3.613264,2.978572 1.253062,0.766326 2.669388,1.42449 4.24796,1.97755 1.578572,0.554082 3.07551,0.976532 4.491836,1.27041 1.416328,0.292856 2.970408,0.521428 4.663266,0.683672 -2.669388,1.82347 -4.004082,4.720408 -4.004082,8.690816 v 7.639796 C 36.536734,89.818368 35.083674,89.3 33.656122,88.695918 c -4.99898,-2.115306 -9.490816,-5.143878 -13.35,-9.00306 -3.859184,-3.859184 -6.887754,-8.351022 -9.00306,-13.35 C 9.1163263,61.171428 8.0071428,55.67347 8.0071428,50 c 0,-5.67347 1.1091835,-11.171428 3.2969392,-16.342858 2.115306,-4.998978 5.143878,-9.490816 9.00306,-13.35 3.859184,-3.859182 8.351022,-6.887754 13.35,-9.00306 C 38.828572,9.1163266 44.32653,8.0071428 50,8.0071428 c 5.67347,0 11.171428,1.1091838 16.342858,3.2969392 5,2.115306 9.490816,5.143878 13.35,9.00306 3.859182,3.859184 6.887754,8.351022 9.00306,13.35 2.186736,5.17245 3.295918,10.67041 3.295918,16.342858 0,5.672448 -1.109182,11.171428 -3.296938,16.342858 -2.115306,4.998978 -5.143878,9.490816 -9.00204,13.35 l 0,0 z"></path></svg></a></li>
+</ul>
+  
+  
+  
+<ul class="subscribe">
+  <li><a href="https://twitter.com/ryanbrush" rel="subscribe-twitter" title="@ryanbrush on Twitter" target="_blank"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25" height="25" viewBox="0 0 512 512"><path class="social" d="M0.001,334.932c33.327,30.816,118.891,59.981,188.517-8.271c-12.52,1.955-22.972-0.416-30.913-8.269
+  c-7.531-7.465-7.945-15.182-3.914-22.202c3.275-5.725,10.184-9.741,16.977-13.934c-12.323,2.285-22.829,1.095-32.218-3.706
+  c-12.604-6.444-24.863-13.228-28.3-27.207c7.71-8.112,16.28-15.359,34.831-12.627c-17.45-5.83-33.087-13.429-44.41-24.815
+  c-11.028-11.091-12.163-18.302-13.932-26.996c9.632-3.567,19.688-5.421,30.478-4.353c-24.397-12.476-34.757-29.63-40.487-48.325
+  c-1.731-5.652-2.044-11.03-1.31-16.545c98.826,37.305,145.11,64.109,170.662,89.251c11.496-30.589,38.3-99.868,78.371-123.646
+  c0.191,3.77-1.309,7.837-4.357,12.189c11.863-6.609,21.125-17.188,37.445-16.98c-1.879,7.723-7.279,13.904-17.85,17.854
+  c10.662-4.084,21.463-7.545,32.65-9.578c10.375-1.881,10.229,6.304,4.355,10.444c-11.916,8.412-24.578,9.456-37.006,13.498
+  c38.105,0.949,69.266,18.994,93.604,58.343c8.088,13.074,13.52,26.149,14.807,40.487c16.254,4.563,32.426,5.494,48.76,2.61
+  c4.475-0.796,8.645-1.63,12.627-3.482c-6.354,9.529-13.686,17.356-23.947,20.899c-9.811,3.387-19.637,6.688-30.473,6.968
+  c17.641,6.675,37.082,7.045,57.033,5.659c-24.402,23.486-43.08,22.922-61.824,22.642c-8.221,34.703-25.025,69.315-60.52,101.005
+  c-46.559,41.569-96.678,61.397-148.457,65.742c-48.552,4.07-95.488,3.512-146.726-20.464
+  C56.486,393.349,24.648,368.884,0.001,334.932L0.001,334.932z"/></svg></a></li>
+</ul>
+  
+  
+  
+  
+  
+  
+    
+      <form action="http://google.com/search" method="get">
+        <fieldset role="search">
+          <input type="hidden" name="sitesearch" value="www.toomuchcode.org" />
+    
+          <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+        </fieldset>
+      </form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Insta-Declarative DSLs!</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+        
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Recently I&rsquo;ve focused on <a href="https://www.youtube.com/watch?v=Z6oVuYmRgkk">retaking rules for developers</a>, where rules aim to be a developer-friendly way to untagle complex logic. Yet some problems call for policy changes without the involvement of developers. We need a simple way to write simple rules.</p>
+
+<p>One approach is to offer a minimal Domain-Specific Language focused on the policy our users need to change. In this post we take a simple example, write a DSL, parse it, validate it, and run it against some data. We&rsquo;ll use the excellent <a href="https://github.com/Engelberg/instaparse">Instaparse</a> library to define the grammar and create the parse tree, and convert that tree into rules executable with <a href="http://www.clara-rules.org">Clara</a>.</p>
+
+<p>First we figure out how we want our DSL to look. To keep things simple, let&rsquo;s imagine a retail setting and let our business user define promotions and discounts based on customer and order information. An example might look like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="nv">discount</span> <span class="nv">my-discount</span> <span class="mi">15</span> <span class="nb">when </span><span class="nv">customer</span> <span class="nv">status</span> <span class="nv">is</span> <span class="nv">platinum.</span>
+</span><span class='line'><span class="nv">discount</span> <span class="nv">extra-discount</span> <span class="mi">10</span> <span class="nb">when </span><span class="nv">customer</span> <span class="nv">status</span> <span class="nv">is</span> <span class="nv">gold</span> <span class="nb">and </span><span class="nv">total</span> <span class="nv">value</span> <span class="nb">&gt; </span><span class="mi">200</span><span class="nv">.</span>
+</span><span class='line'><span class="nv">promotion</span> <span class="nv">free-widget-month</span> <span class="nv">free-widget</span> <span class="nb">when </span><span class="nv">customer</span> <span class="nv">status</span> <span class="nv">is</span> <span class="nv">gold</span> <span class="nb">and </span><span class="nv">order</span> <span class="nv">month</span> <span class="nv">is</span> <span class="nv">august.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Rule engines are a good fit for declarative DSLs because rule engines <em>themselves</em> are declarative. We can see the rule-like structure in the above example: apply this policy when that set of conditions is true.</p>
+
+<p>Now we need to write a function that converts our friendly DSL into rules we can run. Fortunately, in Clara <a href="blog/2014/01/19/rules-as-data/">rules are data</a>, so our function needs to produce a simple data structure rather than generating rules using string manipulation. Using Clojure and <a href="https://github.com/Prismatic/schema">Prismatic Schema</a> to define the structure, our function looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">s/defn</span> <span class="nv">load-user-rules</span> <span class="ss">:-</span> <span class="p">[</span><span class="nv">clara.rules.schema/Production</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;Converts a business rule string into Clara productions.&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">business-rules</span> <span class="ss">:-</span> <span class="nv">s/Str</span><span class="p">]</span>
+</span><span class='line'>  <span class="c1">;; TODO: convert DSL to Clara rule structures.</span>
+</span><span class='line'>  <span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So let&rsquo;s implement it! First we use <a href="https://github.com/Engelberg/instaparse">Instaparse</a> to define our grammar. We can start with the major productions and break their contents. So the discount production would look like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="nv">DISCOUNT</span> <span class="nb">= </span><span class="nv">&lt;</span><span class="ss">&#39;discount&#39;&gt;</span> <span class="nv">NAME</span> <span class="nv">PERCENT</span> <span class="nv">&lt;</span><span class="ss">&#39;when&#39;&gt;</span> <span class="nv">CONDITION</span> <span class="p">[</span><span class="nv">&lt;</span><span class="ss">&#39;and&#39;&gt;</span> <span class="nv">CONDITION</span><span class="p">]</span><span class="nb">* </span><span class="nv">&lt;</span><span class="ss">&#39;.&#39;&gt;</span><span class="c1">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And it contains a series of conditions, like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="nv">CONDITION</span> <span class="nb">= </span><span class="nv">FACTTYPE</span> <span class="nv">FIELD</span> <span class="nv">OPERATOR</span> <span class="nv">VALUE</span> <span class="c1">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And so on. Here is the complete grammar we will use, which we simply bring into our Clojure session:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">require</span> <span class="o">&#39;</span><span class="p">[</span><span class="nv">instaparse.core</span> <span class="ss">:as</span> <span class="nv">insta</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">shopping-grammar</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">insta/parser</span>
+</span><span class='line'>   <span class="s">&quot;&lt;RULES&gt; = [DISCOUNT | PROMOTION]+</span>
+</span><span class='line'><span class="s">    PROMOTION = &lt;&#39;promotion&#39;&gt; NAME PROMOTIONTYPE &lt;&#39;when&#39;&gt; CONDITION [&lt;&#39;and&#39;&gt; CONDITION]* &lt;&#39;.&#39;&gt;;</span>
+</span><span class='line'><span class="s">    DISCOUNT = &lt;&#39;discount&#39;&gt; NAME PERCENT &lt;&#39;when&#39;&gt; CONDITION [&lt;&#39;and&#39;&gt; CONDITION]* &lt;&#39;.&#39;&gt;;</span>
+</span><span class='line'><span class="s">    &lt;PERCENT&gt; = NUMBER ;</span>
+</span><span class='line'><span class="s">    PROMOTIONTYPE = STRING ;</span>
+</span><span class='line'><span class="s">    &lt;NAME&gt; = STRING ;</span>
+</span><span class='line'><span class="s">    NUMBER = #&#39;[0-9]+&#39; ;</span>
+</span><span class='line'><span class="s">    &lt;STRING&gt; = #&#39;[A-Za-z][A-Za-z0-9_-]+&#39; ;</span>
+</span><span class='line'><span class="s">    CONDITION = FACTTYPE FIELD OPERATOR VALUE ;</span>
+</span><span class='line'><span class="s">    FACTTYPE = &#39;customer&#39; | &#39;total&#39; | &#39;order&#39; ;</span>
+</span><span class='line'><span class="s">    &lt;FIELD&gt; = STRING ;</span>
+</span><span class='line'><span class="s">    OPERATOR = &#39;is&#39; | &#39;&gt;&#39; | &#39;&lt;&#39; | &#39;=&#39; ;</span>
+</span><span class='line'><span class="s">    &lt;VALUE&gt; = STRING | NUMBER ;</span>
+</span><span class='line'><span class="s">    &quot;</span>
+</span><span class='line'>   <span class="ss">:auto-whitespace</span> <span class="ss">:standard</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>The of angle brackets indicate productions to omit from the abstract syntax tree and replace by their children. This isn&rsquo;t strictly necessary, but simplifies things when transform the tree.</p>
+
+<p>The <code>insta-parser</code> function actually returns a function that converts an input to the syntax tree! So we can just call it with our DSL and pretty-print the results:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">clojure.pprint/pprint</span>
+</span><span class='line'> <span class="p">(</span><span class="nf">shopping-grammar</span>
+</span><span class='line'>  <span class="s">&quot;discount my-discount 15 when customer status is platinum.</span>
+</span><span class='line'><span class="s">   discount extra-discount 10 when customer status is gold and total value &gt; 200.</span>
+</span><span class='line'><span class="s">   promotion free-widget-month free-widget when customer status is gold and order month is august.&quot;</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Which produces this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">([</span><span class="ss">:DISCOUNT</span>
+</span><span class='line'>  <span class="s">&quot;my-discount&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:NUMBER</span> <span class="s">&quot;15&quot;</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;customer&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="s">&quot;status&quot;</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;is&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="s">&quot;platinum&quot;</span><span class="p">]]</span>
+</span><span class='line'> <span class="p">[</span><span class="ss">:DISCOUNT</span>
+</span><span class='line'>  <span class="s">&quot;extra-discount&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:NUMBER</span> <span class="s">&quot;10&quot;</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span> <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;customer&quot;</span><span class="p">]</span> <span class="s">&quot;status&quot;</span> <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;is&quot;</span><span class="p">]</span> <span class="s">&quot;gold&quot;</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;total&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="s">&quot;value&quot;</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;&gt;&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:NUMBER</span> <span class="s">&quot;200&quot;</span><span class="p">]]]</span>
+</span><span class='line'> <span class="p">[</span><span class="ss">:PROMOTION</span>
+</span><span class='line'>  <span class="s">&quot;free-widget-month&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:PROMOTIONTYPE</span> <span class="s">&quot;free-widget&quot;</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span> <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;customer&quot;</span><span class="p">]</span> <span class="s">&quot;status&quot;</span> <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;is&quot;</span><span class="p">]</span> <span class="s">&quot;gold&quot;</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span> <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;order&quot;</span><span class="p">]</span> <span class="s">&quot;month&quot;</span> <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;is&quot;</span><span class="p">]</span> <span class="s">&quot;august&quot;</span><span class="p">]])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Just for fun, let&rsquo;s see what happens when a user mistypes some input. Let&rsquo;s say &ldquo;customer&rdquo; is misspelled when we evaluate the input against our grammar. So running this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">println</span>
+</span><span class='line'> <span class="p">(</span><span class="nf">shopping-grammar</span>
+</span><span class='line'>  <span class="s">&quot;discount my-discount 15 when customeer status is platinum.&quot;</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>prints out this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="nv">Parse</span> <span class="nv">error</span> <span class="nv">at</span> <span class="nv">line</span> <span class="mi">1</span>, <span class="nv">column</span> <span class="mi">30</span><span class="err">:</span>
+</span><span class='line'><span class="nv">discount</span> <span class="nv">my-discount</span> <span class="mi">15</span> <span class="nb">when </span><span class="nv">customeer</span> <span class="nv">status</span> <span class="nv">is</span> <span class="nv">platinum.</span>
+</span><span class='line'>                             <span class="o">^</span>
+</span><span class='line'><span class="nv">Expected</span> <span class="nv">one</span> <span class="nv">of</span><span class="err">:</span>
+</span><span class='line'><span class="nv">order</span>
+</span><span class='line'><span class="nv">total</span>
+</span><span class='line'><span class="nv">customer</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Great! The error is pretty clear and gives the user options how to fix it. Instaparse does a great job at this.</p>
+
+<p>Alright, let&rsquo;s get back on track and imagine our user fixed the error. We now have a nice parse tree&hellip;we just need to convert it into rules. One way to do this is write a <code>map</code> function that goes through each top-level production and returns a Clara rule. This is a fine approach, and may be a better fit depending on the transformation needed. But in this case I&rsquo;m going to take advantage of another feature of Instaparse: the ability to apply arbitrary transformations to productions in the tree.</p>
+
+<p>The simplest example is we want to replace productions like [:NUMBER &ldquo;15&rdquo;] with&hellip;the actual number 15. This tends to be useful for things like, you know, math.</p>
+
+<p>So let&rsquo;s run a production through our grammar and use the <code>insta/transform</code> function to take a map of transformation for productions. We use Clojure&rsquo;s threading macro to make wiring functions together more readable:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">-&gt;&gt;</span> <span class="s">&quot;discount my-discount 15 when customer status is platinum.&quot;</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">shopping-grammar</span><span class="p">)</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">insta/transform</span> <span class="p">{</span><span class="ss">:NUMBER</span> <span class="o">#</span><span class="p">(</span><span class="nf">Integer/parseInt</span> <span class="nv">%</span><span class="p">)})</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">clojure.pprint/pprint</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This transforms our tree into this, where we have a number rather than an AST production:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">([</span><span class="ss">:DISCOUNT</span>
+</span><span class='line'>  <span class="s">&quot;my-discount&quot;</span>
+</span><span class='line'>  <span class="mi">15</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;customer&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="s">&quot;status&quot;</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;is&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="s">&quot;platinum&quot;</span><span class="p">]])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>So we&rsquo;ve taken our first step of transforming our tree into an actual, executable rule! Now we need to do some more transformations:</p>
+
+<ul>
+<li><code>:OPERATOR</code> gets transformed to a Clojure comparison function</li>
+<li><code>:FACTTYPE</code> gets transformed to a Clojure type. In this case we just use Clojure records.</li>
+<li><code>:PROMOTIONTYPE</code> is an enumeration, which we idiomatically transform to a Clojure keyword</li>
+<li><code>:CONDITION</code> gets transformed into the left-hand side expression of a rule</li>
+<li><code>:DISCOUNT</code> and <code>:PRODUCTION</code> get transformed into actual Clara rules, built on the transformations above! These match the <code>clara.rules.schema/Production</code> Prismatic Schema.</li>
+</ul>
+
+
+<p>I find it&rsquo;s best to build this type of logic from the bottom up in a REPL or a REPL-connected editor. Just start with the simplest transformations, like <code>:NUMBER</code> and <code>:OPERATOR</code>, make sure they work in the REPL, then work on the transformations that use them. I also found myself tweaking the grammar to omit or hide unnecessary productions. After a few quick iterations I ended up with this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">operators</span> <span class="p">{</span><span class="s">&quot;is&quot;</span> <span class="o">`</span><span class="nv">=</span>
+</span><span class='line'>                <span class="s">&quot;&gt;&quot;</span> <span class="o">`</span><span class="nv">&gt;</span>
+</span><span class='line'>                <span class="s">&quot;&lt;&quot;</span> <span class="o">`</span><span class="nv">&lt;</span>
+</span><span class='line'>                <span class="s">&quot;=&quot;</span> <span class="o">`</span><span class="nv">=</span><span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">fact-types</span>
+</span><span class='line'>  <span class="p">{</span><span class="s">&quot;customer&quot;</span> <span class="nv">Customer</span>
+</span><span class='line'>   <span class="s">&quot;total&quot;</span> <span class="nv">Total</span>
+</span><span class='line'>   <span class="s">&quot;order&quot;</span> <span class="nv">Order</span><span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">shopping-transforms</span>
+</span><span class='line'>  <span class="p">{</span><span class="ss">:NUMBER</span> <span class="o">#</span><span class="p">(</span><span class="nf">Integer/parseInt</span> <span class="nv">%</span><span class="p">)</span>
+</span><span class='line'>   <span class="ss">:OPERATOR</span> <span class="nv">operators</span>
+</span><span class='line'>   <span class="ss">:FACTTYPE</span> <span class="nv">fact-types</span>
+</span><span class='line'>   <span class="ss">:CONDITION</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">fact-type</span> <span class="nv">field</span> <span class="nv">operator</span> <span class="nv">value</span><span class="p">]</span>
+</span><span class='line'>                <span class="p">{</span><span class="ss">:type</span> <span class="nv">fact-type</span>
+</span><span class='line'>                 <span class="ss">:constraints</span> <span class="p">[(</span><span class="nb">list </span><span class="nv">operator</span> <span class="p">(</span><span class="nb">symbol </span><span class="nv">field</span><span class="p">)</span> <span class="nv">value</span><span class="p">)]})</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c1">;; Convert promotion strings to keywords.</span>
+</span><span class='line'>   <span class="ss">:PROMOTIONTYPE</span> <span class="nv">keyword</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="ss">:DISCOUNT</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nb">name </span><span class="nv">percent</span> <span class="o">&amp;</span> <span class="nv">conditions</span><span class="p">]</span>
+</span><span class='line'>               <span class="p">{</span><span class="ss">:name</span> <span class="nv">name</span>
+</span><span class='line'>                <span class="ss">:lhs</span> <span class="nv">conditions</span>
+</span><span class='line'>                <span class="ss">:rhs</span> <span class="o">`</span><span class="p">(</span><span class="nf">insert!</span> <span class="p">(</span><span class="nf">-&gt;Discount</span> <span class="o">~</span><span class="nb">name </span><span class="o">~</span><span class="nv">percent</span><span class="p">))})</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="ss">:PROMOTION</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nb">name </span><span class="nv">promotion-type</span> <span class="o">&amp;</span> <span class="nv">conditions</span><span class="p">]</span>
+</span><span class='line'>                <span class="p">{</span><span class="ss">:name</span> <span class="nv">name</span>
+</span><span class='line'>                 <span class="ss">:lhs</span> <span class="nv">conditions</span>
+</span><span class='line'>                 <span class="ss">:rhs</span> <span class="o">`</span><span class="p">(</span><span class="nf">insert!</span> <span class="p">(</span><span class="nf">-&gt;Promotion</span> <span class="o">~</span><span class="nb">name </span><span class="o">~</span><span class="nv">promotion-type</span><span class="p">))})})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s it! This works because the transformations build on top of lower-level transformations. For instance, the <code>:CONDITION</code> transformation is given a fact-type and an operator because those were transformed by the <code>:FACTTYPE</code> and <code>:OPERATOR</code> transformations, respectively. Users could choose to leave out lower-level transformations and have <code>:CONDITION</code> do all of the work, but the above approach shows the power of this Instaparse feature.</p>
+
+<p>Also note our use of the Clojure syntax quote (`) and unquote (~). These are typically used when writing Macros, but they&rsquo;re convenient in this case to build expressions that Clara turns into rules. (After all, Clara is really just a big macro that converts user expressions into a rete network!)</p>
+
+<p>Now let&rsquo;s run this set of transformations against our input data:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">-&gt;&gt;</span> <span class="s">&quot;discount my-discount 15 when customer status is platinum.</span>
+</span><span class='line'><span class="s">      discount extra-discount 10 when customer status is gold and total value &gt; 200.</span>
+</span><span class='line'><span class="s">      promotion free-widget-month free-widget when customer status is gold and order month is august.&quot;</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">shopping-grammar</span><span class="p">)</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">insta/transform</span> <span class="nv">shopping-transforms</span><span class="p">)</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">clojure.pprint/pprint</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This produces:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">({</span><span class="ss">:name</span> <span class="s">&quot;my-discount&quot;</span>,
+</span><span class='line'>  <span class="ss">:lhs</span>
+</span><span class='line'>  <span class="p">({</span><span class="ss">:type</span> <span class="nv">clara.examples.insta.Customer</span>,
+</span><span class='line'>    <span class="ss">:constraints</span> <span class="p">[(</span><span class="nf">clojure.core/=</span> <span class="nv">status</span> <span class="s">&quot;platinum&quot;</span><span class="p">)]})</span>,
+</span><span class='line'>  <span class="ss">:rhs</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">clara.rules/insert!</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">clara.examples.insta/-&gt;Discount</span> <span class="s">&quot;my-discount&quot;</span> <span class="mi">15</span><span class="p">))}</span>
+</span><span class='line'> <span class="p">{</span><span class="ss">:name</span> <span class="s">&quot;extra-discount&quot;</span>,
+</span><span class='line'>  <span class="ss">:lhs</span>
+</span><span class='line'>  <span class="p">({</span><span class="ss">:type</span> <span class="nv">clara.examples.insta.Customer</span>,
+</span><span class='line'>    <span class="ss">:constraints</span> <span class="p">[(</span><span class="nf">clojure.core/=</span> <span class="nv">status</span> <span class="s">&quot;gold&quot;</span><span class="p">)]}</span>
+</span><span class='line'>   <span class="p">{</span><span class="ss">:type</span> <span class="nv">clara.examples.insta.Total</span>,
+</span><span class='line'>    <span class="ss">:constraints</span> <span class="p">[(</span><span class="nf">clojure.core/&gt;</span> <span class="nv">value</span> <span class="mi">200</span><span class="p">)]})</span>,
+</span><span class='line'>  <span class="ss">:rhs</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">clara.rules/insert!</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">clara.examples.insta/-&gt;Discount</span> <span class="s">&quot;extra-discount&quot;</span> <span class="mi">10</span><span class="p">))}</span>
+</span><span class='line'> <span class="p">{</span><span class="ss">:name</span> <span class="s">&quot;free-widget-month&quot;</span>,
+</span><span class='line'>  <span class="ss">:lhs</span>
+</span><span class='line'>  <span class="p">({</span><span class="ss">:type</span> <span class="nv">clara.examples.insta.Customer</span>,
+</span><span class='line'>    <span class="ss">:constraints</span> <span class="p">[(</span><span class="nf">clojure.core/=</span> <span class="nv">status</span> <span class="s">&quot;gold&quot;</span><span class="p">)]}</span>
+</span><span class='line'>   <span class="p">{</span><span class="ss">:type</span> <span class="nv">clara.examples.insta.Order</span>,
+</span><span class='line'>    <span class="ss">:constraints</span> <span class="p">[(</span><span class="nf">clojure.core/=</span> <span class="nv">month</span> <span class="s">&quot;august&quot;</span><span class="p">)]})</span>,
+</span><span class='line'>  <span class="ss">:rhs</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">clara.rules/insert!</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">clara.examples.insta/-&gt;Promotion</span>
+</span><span class='line'>    <span class="s">&quot;free-widget-month&quot;</span>
+</span><span class='line'>    <span class="ss">:free-widget</span><span class="p">))})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Now we have a sequence of rules we can run! We can pass this directly into the <a href="http://www.clara-rules.org/apidocs/0.9.0/clojure/clara.rules.html#var-mk-session">mk-session</a> function and create an actual rule session!</p>
+
+<p>We can also combine these rules with others written by Clara&rsquo;s <a href="http://www.clara-rules.org/apidocs/0.9.0/clojure/clara.rules.html#var-defrule">defrule</a> or generated from some other source. You can see the full code in the <a href="https://github.com/rbrush/clara-examples/blob/master/src/main/clojure/clara/examples/insta.clj">clara.examples.insta</a> namespace in the clara-examples project, but here is the pertinent segment for running our rules:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">session</span> <span class="p">(</span><span class="nb">-&gt; </span><span class="p">(</span><span class="nf">mk-session</span> <span class="ss">&#39;clara.examples.insta</span> <span class="p">(</span><span class="nf">load-user-rules</span> <span class="nv">example-rules</span><span class="p">))</span>
+</span><span class='line'>                  <span class="p">(</span><span class="nf">insert</span> <span class="p">(</span><span class="nf">-&gt;Customer</span> <span class="s">&quot;gold&quot;</span><span class="p">)</span>
+</span><span class='line'>                          <span class="p">(</span><span class="nf">-&gt;Order</span> <span class="mi">2013</span> <span class="s">&quot;august&quot;</span> <span class="mi">20</span><span class="p">)</span>
+</span><span class='line'>                          <span class="p">(</span><span class="nf">-&gt;Purchase</span> <span class="mi">20</span> <span class="ss">:gizmo</span><span class="p">)</span>
+</span><span class='line'>                          <span class="p">(</span><span class="nf">-&gt;Purchase</span> <span class="mi">120</span> <span class="ss">:widget</span><span class="p">)</span>
+</span><span class='line'>                          <span class="p">(</span><span class="nf">-&gt;Purchase</span> <span class="mi">90</span> <span class="ss">:widget</span><span class="p">))</span>
+</span><span class='line'>                  <span class="p">(</span><span class="nf">fire-rules</span><span class="p">))]</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">clojure.pprint/pprint</span> <span class="p">(</span><span class="nf">query</span> <span class="nv">session</span> <span class="nv">get-discounts</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">clojure.pprint/pprint</span> <span class="p">(</span><span class="nf">query</span> <span class="nv">session</span> <span class="nv">get-promotions</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Running this produces the following output:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">({</span><span class="ss">:?discount</span> <span class="p">{</span><span class="ss">:name</span> <span class="s">&quot;extra-discount&quot;</span>, <span class="ss">:percent</span> <span class="mi">10</span><span class="p">}})</span>
+</span><span class='line'><span class="p">({</span><span class="ss">:?discount</span> <span class="p">{</span><span class="ss">:reason</span> <span class="s">&quot;free-widget-month&quot;</span>, <span class="ss">:type</span> <span class="ss">:free-widget</span><span class="p">}})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And that&rsquo;s it! The complete code for this is in <a href="https://github.com/rbrush/clara-examples/blob/master/src/main/clojure/clara/examples/insta.clj">clara-examples</a>. Details on Instaparse can be found on the <a href="https://github.com/Engelberg/instaparse">Instaparse github page</a> and Clara documentation is at <a href="http://www.clara-rules.org">clara-rules.org</a>.</p>
+
+<p>Finally, we once again see how powerful Clojure&rsquo;s composable design is. The Instaparse and Clara libraries were built completely independently, but since both use functional transformations of immutable data structures we were able to combine them to create something useful in a small amount of code. Plus hacking on this stuff is just plain <em>fun</em>.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+
+
+  <span class="byline author vcard">Authored by <span class="fn">
+  
+    Ryan Brush
+  
+  </span></span>
+
+
+      
+
+
+
+
+
+      
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://www.toomuchcode.org/blog/2015/11/14/insta-declarative-dsls/" data-via="ryanbrush" data-counturl="http://www.toomuchcode.org/blog/2015/11/14/insta-declarative-dsls/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/11/11/clara-rules-site/" title="Previous Post: Clara Rules Site">&laquo; Clara Rules Site</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+
+</div>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Ryan Brush -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a> | Themed with <a href="https://github.com/lucaslew/whitespace">Whitespace</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

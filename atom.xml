@@ -4,7 +4,7 @@
   <title><![CDATA[Too Much Code]]></title>
   <link href="http://www.toomuchcode.org/atom.xml" rel="self"/>
   <link href="http://www.toomuchcode.org/"/>
-  <updated>2015-11-12T00:36:05-06:00</updated>
+  <updated>2015-11-14T10:58:36-06:00</updated>
   <id>http://www.toomuchcode.org/</id>
   <author>
     <name><![CDATA[Ryan Brush]]></name>
@@ -12,6 +12,440 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Insta-Declarative DSLs!]]></title>
+    <link href="http://www.toomuchcode.org/blog/2015/11/14/insta-declarative-dsls/"/>
+    <updated>2015-11-14T07:47:34-06:00</updated>
+    <id>http://www.toomuchcode.org/blog/2015/11/14/insta-declarative-dsls</id>
+    <content type="html"><![CDATA[<p>Recently I&rsquo;ve focused on <a href="https://www.youtube.com/watch?v=Z6oVuYmRgkk">retaking rules for developers</a>, where rules aim to be a developer-friendly way to untagle complex logic. Yet some problems call for policy changes without the involvement of developers. We need a simple way to write simple rules.</p>
+
+<p>One approach is to offer a minimal Domain-Specific Language focused on the policy our users need to change. In this post we take a simple example, write a DSL, parse it, validate it, and run it against some data. We&rsquo;ll use the excellent <a href="https://github.com/Engelberg/instaparse">Instaparse</a> library to define the grammar and create the parse tree, and convert that tree into rules executable with <a href="http://www.clara-rules.org">Clara</a>.</p>
+
+<p>First we figure out how we want our DSL to look. To keep things simple, let&rsquo;s imagine a retail setting and let our business user define promotions and discounts based on customer and order information. An example might look like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="nv">discount</span> <span class="nv">my-discount</span> <span class="mi">15</span> <span class="nb">when </span><span class="nv">customer</span> <span class="nv">status</span> <span class="nv">is</span> <span class="nv">platinum.</span>
+</span><span class='line'><span class="nv">discount</span> <span class="nv">extra-discount</span> <span class="mi">10</span> <span class="nb">when </span><span class="nv">customer</span> <span class="nv">status</span> <span class="nv">is</span> <span class="nv">gold</span> <span class="nb">and </span><span class="nv">total</span> <span class="nv">value</span> <span class="nb">&gt; </span><span class="mi">200</span><span class="nv">.</span>
+</span><span class='line'><span class="nv">promotion</span> <span class="nv">free-widget-month</span> <span class="nv">free-widget</span> <span class="nb">when </span><span class="nv">customer</span> <span class="nv">status</span> <span class="nv">is</span> <span class="nv">gold</span> <span class="nb">and </span><span class="nv">order</span> <span class="nv">month</span> <span class="nv">is</span> <span class="nv">august.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Rule engines are a good fit for declarative DSLs because rule engines <em>themselves</em> are declarative. We can see the rule-like structure in the above example: apply this policy when that set of conditions is true.</p>
+
+<p>Now we need to write a function that converts our friendly DSL into rules we can run. Fortunately, in Clara <a href="blog/2014/01/19/rules-as-data/">rules are data</a>, so our function needs to produce a simple data structure rather than generating rules using string manipulation. Using Clojure and <a href="https://github.com/Prismatic/schema">Prismatic Schema</a> to define the structure, our function looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">s/defn</span> <span class="nv">load-user-rules</span> <span class="ss">:-</span> <span class="p">[</span><span class="nv">clara.rules.schema/Production</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;Converts a business rule string into Clara productions.&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">business-rules</span> <span class="ss">:-</span> <span class="nv">s/Str</span><span class="p">]</span>
+</span><span class='line'>  <span class="c1">;; TODO: convert DSL to Clara rule structures.</span>
+</span><span class='line'>  <span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So let&rsquo;s implement it! First we use <a href="https://github.com/Engelberg/instaparse">Instaparse</a> to define our grammar. We can start with the major productions and break their contents. So the discount production would look like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="nv">DISCOUNT</span> <span class="nb">= </span><span class="nv">&lt;</span><span class="ss">&#39;discount&#39;&gt;</span> <span class="nv">NAME</span> <span class="nv">PERCENT</span> <span class="nv">&lt;</span><span class="ss">&#39;when&#39;&gt;</span> <span class="nv">CONDITION</span> <span class="p">[</span><span class="nv">&lt;</span><span class="ss">&#39;and&#39;&gt;</span> <span class="nv">CONDITION</span><span class="p">]</span><span class="nb">* </span><span class="nv">&lt;</span><span class="ss">&#39;.&#39;&gt;</span><span class="c1">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And it contains a series of conditions, like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="nv">CONDITION</span> <span class="nb">= </span><span class="nv">FACTTYPE</span> <span class="nv">FIELD</span> <span class="nv">OPERATOR</span> <span class="nv">VALUE</span> <span class="c1">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And so on. Here is the complete grammar we will use, which we simply bring into our Clojure session:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">require</span> <span class="o">&#39;</span><span class="p">[</span><span class="nv">instaparse.core</span> <span class="ss">:as</span> <span class="nv">insta</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">shopping-grammar</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">insta/parser</span>
+</span><span class='line'>   <span class="s">&quot;&lt;RULES&gt; = [DISCOUNT | PROMOTION]+</span>
+</span><span class='line'><span class="s">    PROMOTION = &lt;&#39;promotion&#39;&gt; NAME PROMOTIONTYPE &lt;&#39;when&#39;&gt; CONDITION [&lt;&#39;and&#39;&gt; CONDITION]* &lt;&#39;.&#39;&gt;;</span>
+</span><span class='line'><span class="s">    DISCOUNT = &lt;&#39;discount&#39;&gt; NAME PERCENT &lt;&#39;when&#39;&gt; CONDITION [&lt;&#39;and&#39;&gt; CONDITION]* &lt;&#39;.&#39;&gt;;</span>
+</span><span class='line'><span class="s">    &lt;PERCENT&gt; = NUMBER ;</span>
+</span><span class='line'><span class="s">    PROMOTIONTYPE = STRING ;</span>
+</span><span class='line'><span class="s">    &lt;NAME&gt; = STRING ;</span>
+</span><span class='line'><span class="s">    NUMBER = #&#39;[0-9]+&#39; ;</span>
+</span><span class='line'><span class="s">    &lt;STRING&gt; = #&#39;[A-Za-z][A-Za-z0-9_-]+&#39; ;</span>
+</span><span class='line'><span class="s">    CONDITION = FACTTYPE FIELD OPERATOR VALUE ;</span>
+</span><span class='line'><span class="s">    FACTTYPE = &#39;customer&#39; | &#39;total&#39; | &#39;order&#39; ;</span>
+</span><span class='line'><span class="s">    &lt;FIELD&gt; = STRING ;</span>
+</span><span class='line'><span class="s">    OPERATOR = &#39;is&#39; | &#39;&gt;&#39; | &#39;&lt;&#39; | &#39;=&#39; ;</span>
+</span><span class='line'><span class="s">    &lt;VALUE&gt; = STRING | NUMBER ;</span>
+</span><span class='line'><span class="s">    &quot;</span>
+</span><span class='line'>   <span class="ss">:auto-whitespace</span> <span class="ss">:standard</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>The of angle brackets indicate productions to omit from the abstract syntax tree and replace by their children. This isn&rsquo;t strictly necessary, but simplifies things when transform the tree.</p>
+
+<p>The <code>insta-parser</code> function actually returns a function that converts an input to the syntax tree! So we can just call it with our DSL and pretty-print the results:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">clojure.pprint/pprint</span>
+</span><span class='line'> <span class="p">(</span><span class="nf">shopping-grammar</span>
+</span><span class='line'>  <span class="s">&quot;discount my-discount 15 when customer status is platinum.</span>
+</span><span class='line'><span class="s">   discount extra-discount 10 when customer status is gold and total value &gt; 200.</span>
+</span><span class='line'><span class="s">   promotion free-widget-month free-widget when customer status is gold and order month is august.&quot;</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Which produces this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">([</span><span class="ss">:DISCOUNT</span>
+</span><span class='line'>  <span class="s">&quot;my-discount&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:NUMBER</span> <span class="s">&quot;15&quot;</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;customer&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="s">&quot;status&quot;</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;is&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="s">&quot;platinum&quot;</span><span class="p">]]</span>
+</span><span class='line'> <span class="p">[</span><span class="ss">:DISCOUNT</span>
+</span><span class='line'>  <span class="s">&quot;extra-discount&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:NUMBER</span> <span class="s">&quot;10&quot;</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span> <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;customer&quot;</span><span class="p">]</span> <span class="s">&quot;status&quot;</span> <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;is&quot;</span><span class="p">]</span> <span class="s">&quot;gold&quot;</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;total&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="s">&quot;value&quot;</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;&gt;&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:NUMBER</span> <span class="s">&quot;200&quot;</span><span class="p">]]]</span>
+</span><span class='line'> <span class="p">[</span><span class="ss">:PROMOTION</span>
+</span><span class='line'>  <span class="s">&quot;free-widget-month&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:PROMOTIONTYPE</span> <span class="s">&quot;free-widget&quot;</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span> <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;customer&quot;</span><span class="p">]</span> <span class="s">&quot;status&quot;</span> <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;is&quot;</span><span class="p">]</span> <span class="s">&quot;gold&quot;</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span> <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;order&quot;</span><span class="p">]</span> <span class="s">&quot;month&quot;</span> <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;is&quot;</span><span class="p">]</span> <span class="s">&quot;august&quot;</span><span class="p">]])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Just for fun, let&rsquo;s see what happens when a user mistypes some input. Let&rsquo;s say &ldquo;customer&rdquo; is misspelled when we evaluate the input against our grammar. So running this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">println</span>
+</span><span class='line'> <span class="p">(</span><span class="nf">shopping-grammar</span>
+</span><span class='line'>  <span class="s">&quot;discount my-discount 15 when customeer status is platinum.&quot;</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>prints out this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="nv">Parse</span> <span class="nv">error</span> <span class="nv">at</span> <span class="nv">line</span> <span class="mi">1</span>, <span class="nv">column</span> <span class="mi">30</span><span class="err">:</span>
+</span><span class='line'><span class="nv">discount</span> <span class="nv">my-discount</span> <span class="mi">15</span> <span class="nb">when </span><span class="nv">customeer</span> <span class="nv">status</span> <span class="nv">is</span> <span class="nv">platinum.</span>
+</span><span class='line'>                             <span class="o">^</span>
+</span><span class='line'><span class="nv">Expected</span> <span class="nv">one</span> <span class="nv">of</span><span class="err">:</span>
+</span><span class='line'><span class="nv">order</span>
+</span><span class='line'><span class="nv">total</span>
+</span><span class='line'><span class="nv">customer</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Great! The error is pretty clear and gives the user options how to fix it. Instaparse does a great job at this.</p>
+
+<p>Alright, let&rsquo;s get back on track and imagine our user fixed the error. We now have a nice parse tree&hellip;we just need to convert it into rules. One way to do this is write a <code>map</code> function that goes through each top-level production and returns a Clara rule. This is a fine approach, and may be a better fit depending on the transformation needed. But in this case I&rsquo;m going to take advantage of another feature of Instaparse: the ability to apply arbitrary transformations to productions in the tree.</p>
+
+<p>The simplest example is we want to replace productions like [:NUMBER &ldquo;15&rdquo;] with&hellip;the actual number 15. This tends to be useful for things like, you know, math.</p>
+
+<p>So let&rsquo;s run a production through our grammar and use the <code>insta/transform</code> function to take a map of transformation for productions. We use Clojure&rsquo;s threading macro to make wiring functions together more readable:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">-&gt;&gt;</span> <span class="s">&quot;discount my-discount 15 when customer status is platinum.&quot;</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">shopping-grammar</span><span class="p">)</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">insta/transform</span> <span class="p">{</span><span class="ss">:NUMBER</span> <span class="o">#</span><span class="p">(</span><span class="nf">Integer/parseInt</span> <span class="nv">%</span><span class="p">)})</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">clojure.pprint/pprint</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This transforms our tree into this, where we have a number rather than an AST production:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">([</span><span class="ss">:DISCOUNT</span>
+</span><span class='line'>  <span class="s">&quot;my-discount&quot;</span>
+</span><span class='line'>  <span class="mi">15</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;customer&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="s">&quot;status&quot;</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;is&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="s">&quot;platinum&quot;</span><span class="p">]])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>So we&rsquo;ve taken our first step of transforming our tree into an actual, executable rule! Now we need to do some more transformations:</p>
+
+<ul>
+<li><code>:OPERATOR</code> gets transformed to a Clojure comparison function</li>
+<li><code>:FACTTYPE</code> gets transformed to a Clojure type. In this case we just use Clojure records.</li>
+<li><code>:PROMOTIONTYPE</code> is an enumeration, which we idiomatically transform to a Clojure keyword</li>
+<li><code>:CONDITION</code> gets transformed into the left-hand side expression of a rule</li>
+<li><code>:DISCOUNT</code> and <code>:PRODUCTION</code> get transformed into actual Clara rules, built on the transformations above! These match the <code>clara.rules.schema/Production</code> Prismatic Schema.</li>
+</ul>
+
+
+<p>I find it&rsquo;s best to build this type of logic from the bottom up in a REPL or a REPL-connected editor. Just start with the simplest transformations, like <code>:NUMBER</code> and <code>:OPERATOR</code>, make sure they work in the REPL, then work on the transformations that use them. I also found myself tweaking the grammar to omit or hide unnecessary productions. After a few quick iterations I ended up with this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">operators</span> <span class="p">{</span><span class="s">&quot;is&quot;</span> <span class="o">`</span><span class="nv">=</span>
+</span><span class='line'>                <span class="s">&quot;&gt;&quot;</span> <span class="o">`</span><span class="nv">&gt;</span>
+</span><span class='line'>                <span class="s">&quot;&lt;&quot;</span> <span class="o">`</span><span class="nv">&lt;</span>
+</span><span class='line'>                <span class="s">&quot;=&quot;</span> <span class="o">`</span><span class="nv">=</span><span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">fact-types</span>
+</span><span class='line'>  <span class="p">{</span><span class="s">&quot;customer&quot;</span> <span class="nv">Customer</span>
+</span><span class='line'>   <span class="s">&quot;total&quot;</span> <span class="nv">Total</span>
+</span><span class='line'>   <span class="s">&quot;order&quot;</span> <span class="nv">Order</span><span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">shopping-transforms</span>
+</span><span class='line'>  <span class="p">{</span><span class="ss">:NUMBER</span> <span class="o">#</span><span class="p">(</span><span class="nf">Integer/parseInt</span> <span class="nv">%</span><span class="p">)</span>
+</span><span class='line'>   <span class="ss">:OPERATOR</span> <span class="nv">operators</span>
+</span><span class='line'>   <span class="ss">:FACTTYPE</span> <span class="nv">fact-types</span>
+</span><span class='line'>   <span class="ss">:CONDITION</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">fact-type</span> <span class="nv">field</span> <span class="nv">operator</span> <span class="nv">value</span><span class="p">]</span>
+</span><span class='line'>                <span class="p">{</span><span class="ss">:type</span> <span class="nv">fact-type</span>
+</span><span class='line'>                 <span class="ss">:constraints</span> <span class="p">[(</span><span class="nb">list </span><span class="nv">operator</span> <span class="p">(</span><span class="nb">symbol </span><span class="nv">field</span><span class="p">)</span> <span class="nv">value</span><span class="p">)]})</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c1">;; Convert promotion strings to keywords.</span>
+</span><span class='line'>   <span class="ss">:PROMOTIONTYPE</span> <span class="nv">keyword</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="ss">:DISCOUNT</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nb">name </span><span class="nv">percent</span> <span class="o">&amp;</span> <span class="nv">conditions</span><span class="p">]</span>
+</span><span class='line'>               <span class="p">{</span><span class="ss">:name</span> <span class="nv">name</span>
+</span><span class='line'>                <span class="ss">:lhs</span> <span class="nv">conditions</span>
+</span><span class='line'>                <span class="ss">:rhs</span> <span class="o">`</span><span class="p">(</span><span class="nf">insert!</span> <span class="p">(</span><span class="nf">-&gt;Discount</span> <span class="o">~</span><span class="nb">name </span><span class="o">~</span><span class="nv">percent</span><span class="p">))})</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="ss">:PROMOTION</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nb">name </span><span class="nv">promotion-type</span> <span class="o">&amp;</span> <span class="nv">conditions</span><span class="p">]</span>
+</span><span class='line'>                <span class="p">{</span><span class="ss">:name</span> <span class="nv">name</span>
+</span><span class='line'>                 <span class="ss">:lhs</span> <span class="nv">conditions</span>
+</span><span class='line'>                 <span class="ss">:rhs</span> <span class="o">`</span><span class="p">(</span><span class="nf">insert!</span> <span class="p">(</span><span class="nf">-&gt;Promotion</span> <span class="o">~</span><span class="nb">name </span><span class="o">~</span><span class="nv">promotion-type</span><span class="p">))})})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s it! This works because the transformations build on top of lower-level transformations. For instance, the <code>:CONDITION</code> transformation is given a fact-type and an operator because those were transformed by the <code>:FACTTYPE</code> and <code>:OPERATOR</code> transformations, respectively. Users could choose to leave out lower-level transformations and have <code>:CONDITION</code> do all of the work, but the above approach shows the power of this Instaparse feature.</p>
+
+<p>Also note our use of the Clojure syntax quote (`) and unquote (~). These are typically used when writing Macros, but they&rsquo;re convenient in this case to build expressions that Clara turns into rules. (After all, Clara is really just a big macro that converts user expressions into a rete network!)</p>
+
+<p>Now let&rsquo;s run this set of transformations against our input data:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">-&gt;&gt;</span> <span class="s">&quot;discount my-discount 15 when customer status is platinum.</span>
+</span><span class='line'><span class="s">      discount extra-discount 10 when customer status is gold and total value &gt; 200.</span>
+</span><span class='line'><span class="s">      promotion free-widget-month free-widget when customer status is gold and order month is august.&quot;</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">shopping-grammar</span><span class="p">)</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">insta/transform</span> <span class="nv">shopping-transforms</span><span class="p">)</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">clojure.pprint/pprint</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This produces:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">({</span><span class="ss">:name</span> <span class="s">&quot;my-discount&quot;</span>,
+</span><span class='line'>  <span class="ss">:lhs</span>
+</span><span class='line'>  <span class="p">({</span><span class="ss">:type</span> <span class="nv">clara.examples.insta.Customer</span>,
+</span><span class='line'>    <span class="ss">:constraints</span> <span class="p">[(</span><span class="nf">clojure.core/=</span> <span class="nv">status</span> <span class="s">&quot;platinum&quot;</span><span class="p">)]})</span>,
+</span><span class='line'>  <span class="ss">:rhs</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">clara.rules/insert!</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">clara.examples.insta/-&gt;Discount</span> <span class="s">&quot;my-discount&quot;</span> <span class="mi">15</span><span class="p">))}</span>
+</span><span class='line'> <span class="p">{</span><span class="ss">:name</span> <span class="s">&quot;extra-discount&quot;</span>,
+</span><span class='line'>  <span class="ss">:lhs</span>
+</span><span class='line'>  <span class="p">({</span><span class="ss">:type</span> <span class="nv">clara.examples.insta.Customer</span>,
+</span><span class='line'>    <span class="ss">:constraints</span> <span class="p">[(</span><span class="nf">clojure.core/=</span> <span class="nv">status</span> <span class="s">&quot;gold&quot;</span><span class="p">)]}</span>
+</span><span class='line'>   <span class="p">{</span><span class="ss">:type</span> <span class="nv">clara.examples.insta.Total</span>,
+</span><span class='line'>    <span class="ss">:constraints</span> <span class="p">[(</span><span class="nf">clojure.core/&gt;</span> <span class="nv">value</span> <span class="mi">200</span><span class="p">)]})</span>,
+</span><span class='line'>  <span class="ss">:rhs</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">clara.rules/insert!</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">clara.examples.insta/-&gt;Discount</span> <span class="s">&quot;extra-discount&quot;</span> <span class="mi">10</span><span class="p">))}</span>
+</span><span class='line'> <span class="p">{</span><span class="ss">:name</span> <span class="s">&quot;free-widget-month&quot;</span>,
+</span><span class='line'>  <span class="ss">:lhs</span>
+</span><span class='line'>  <span class="p">({</span><span class="ss">:type</span> <span class="nv">clara.examples.insta.Customer</span>,
+</span><span class='line'>    <span class="ss">:constraints</span> <span class="p">[(</span><span class="nf">clojure.core/=</span> <span class="nv">status</span> <span class="s">&quot;gold&quot;</span><span class="p">)]}</span>
+</span><span class='line'>   <span class="p">{</span><span class="ss">:type</span> <span class="nv">clara.examples.insta.Order</span>,
+</span><span class='line'>    <span class="ss">:constraints</span> <span class="p">[(</span><span class="nf">clojure.core/=</span> <span class="nv">month</span> <span class="s">&quot;august&quot;</span><span class="p">)]})</span>,
+</span><span class='line'>  <span class="ss">:rhs</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">clara.rules/insert!</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">clara.examples.insta/-&gt;Promotion</span>
+</span><span class='line'>    <span class="s">&quot;free-widget-month&quot;</span>
+</span><span class='line'>    <span class="ss">:free-widget</span><span class="p">))})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Now we have a sequence of rules we can run! We can pass this directly into the <a href="http://www.clara-rules.org/apidocs/0.9.0/clojure/clara.rules.html#var-mk-session">mk-session</a> function and create an actual rule session!</p>
+
+<p>We can also combine these rules with others written by Clara&rsquo;s <a href="http://www.clara-rules.org/apidocs/0.9.0/clojure/clara.rules.html#var-defrule">defrule</a> or generated from some other source. You can see the full code in the <a href="https://github.com/rbrush/clara-examples/blob/master/src/main/clojure/clara/examples/insta.clj">clara.examples.insta</a> namespace in the clara-examples project, but here is the pertinent segment for running our rules:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">session</span> <span class="p">(</span><span class="nb">-&gt; </span><span class="p">(</span><span class="nf">mk-session</span> <span class="ss">&#39;clara.examples.insta</span> <span class="p">(</span><span class="nf">load-user-rules</span> <span class="nv">example-rules</span><span class="p">))</span>
+</span><span class='line'>                  <span class="p">(</span><span class="nf">insert</span> <span class="p">(</span><span class="nf">-&gt;Customer</span> <span class="s">&quot;gold&quot;</span><span class="p">)</span>
+</span><span class='line'>                          <span class="p">(</span><span class="nf">-&gt;Order</span> <span class="mi">2013</span> <span class="s">&quot;august&quot;</span> <span class="mi">20</span><span class="p">)</span>
+</span><span class='line'>                          <span class="p">(</span><span class="nf">-&gt;Purchase</span> <span class="mi">20</span> <span class="ss">:gizmo</span><span class="p">)</span>
+</span><span class='line'>                          <span class="p">(</span><span class="nf">-&gt;Purchase</span> <span class="mi">120</span> <span class="ss">:widget</span><span class="p">)</span>
+</span><span class='line'>                          <span class="p">(</span><span class="nf">-&gt;Purchase</span> <span class="mi">90</span> <span class="ss">:widget</span><span class="p">))</span>
+</span><span class='line'>                  <span class="p">(</span><span class="nf">fire-rules</span><span class="p">))]</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">clojure.pprint/pprint</span> <span class="p">(</span><span class="nf">query</span> <span class="nv">session</span> <span class="nv">get-discounts</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">clojure.pprint/pprint</span> <span class="p">(</span><span class="nf">query</span> <span class="nv">session</span> <span class="nv">get-promotions</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Running this produces the following output:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">({</span><span class="ss">:?discount</span> <span class="p">{</span><span class="ss">:name</span> <span class="s">&quot;extra-discount&quot;</span>, <span class="ss">:percent</span> <span class="mi">10</span><span class="p">}})</span>
+</span><span class='line'><span class="p">({</span><span class="ss">:?discount</span> <span class="p">{</span><span class="ss">:reason</span> <span class="s">&quot;free-widget-month&quot;</span>, <span class="ss">:type</span> <span class="ss">:free-widget</span><span class="p">}})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And that&rsquo;s it! The complete code for this is in <a href="https://github.com/rbrush/clara-examples/blob/master/src/main/clojure/clara/examples/insta.clj">clara-examples</a>. Details on Instaparse can be found on the <a href="https://github.com/Engelberg/instaparse">Instaparse github page</a> and Clara documentation is at <a href="http://www.clara-rules.org">clara-rules.org</a>.</p>
+
+<p>Finally, we once again see how powerful Clojure&rsquo;s composable design is. The Instaparse and Clara libraries were built completely independently, but since both use functional transformations of immutable data structures we were able to combine them to create something useful in a small amount of code. Plus hacking on this stuff is just plain <em>fun</em>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Clara Rules Site]]></title>
@@ -529,14 +963,6 @@ The resulting query returns the matching promotions. More sophisticated examples
     <updated>2007-06-03T16:38:05Z</updated>
     <id>http://www.toomuchcode.org/blog/2007/06/03/why-are-we-so-polarized-about-java</id>
     <content type="html"><![CDATA[It seems impossible to constructively praise or criticize Java without eliciting strong reactions.  It comes from both sides; some seem to love to hate Java, and parts of the Java community become defensive as a reaction.<br /><br />For example, Paul Buchheit recently <a title="posted some insights" href="http://paulbuchheit.blogspot.com/2007/05/amazingly-bad-apis.html">posted some insights</a> into API design, referring to poor examples that happen to be written in Java.  He immediately states he doesn&#8217;t hate Java.  The post is about APIs, not the language.  Even so, he still had to update his post saying &#8220;It&#8217;s not about Java, really&#8221;, presumably because of some polarized reactions.   This is unfortunate because it distracts us from Paul&#8217;s excellent commentary.<br /><br />I suspect the polarization starts from a trap I have fallen into myself.  Like many involved in language discussions, I use Java professionally and other languages at night, so I run into examples analogous to the one described by Paul Buchheit.  I sometimes get frustrated with poor APIs, and also with the Java language &#8211; either directly or by association with poor APIs.  I wonder, couldn&#8217;t it use powerful constructs I use in other languages, or could the APIs just plain be simpler?  <br /><br />The problem is my frustration may linger when I discuss programming languages, and (knowingly or unknowingly) be reflected in my tone when discussing Java.  The resulting post is more acidic, and less level handed than I would like.  Those who disagree with my arguments are likely to pick up on that tone and may respond in kind.  Before long we&#8217;ve spiraled into isolated camps, and meaningful discussion is hard to achieve.  My <a title="last post" href="http://toomuchcode.blogspot.com/2007/05/why-java-lost-its-mojo-and-what-sun-is.html">last post</a> had signs of this.<br /><br />So, where did I go wrong?  When discussing constructive criticism of Java and its APIs, we need to view Java with some perspective.  We need to remember its history.  So my first point is:<br /><blockquote><div style="text-align: left;"> </div><i>We are critical of Java in a context different from the one in which it was designed.</i></blockquote><i></i>  A key goal for Java was to replace C++, and this goal led to design decisions that are often targets for criticism today.  In 1996 it wasn&#8217;t clear we could create a sufficiently fast language without primitive types and arrays.  It wasn&#8217;t clear how much boilerplate code would be required by anonymous callback classes or checked exceptions.  It wasn&#8217;t clear that since the <i>new</i> syntax exactly specifies implementation, factory patterns would proliferate, and so on.  So my second point:<br /><div style="text-align: left;"><blockquote> <i>Criticisms of Java should not imply any negatives about the designers of Java.  Critics of Java are likely working in a problem space that differs from Java&#8217;s original design goals, or incorporating new knowledge from the past decade.</i></blockquote><i></i></div>  There are certainly some that disagreed with the above decisions in 1996, but it was surely more debatable then, and different decisions may have slowed Java&#8217;s proliferation &#8211; which was opposed to its original design goals.<br /><br />The key is we need to keep this background in mind whenever discussing Java.  We can criticize Java and its APIs without insulting anyone.  When being critical of Java, any frustrations should be tempered by knowing the landscape has changed.  Similarly, apologists should recognize that criticism need not be viewed as an attack; it might be an attempt to make things better.]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Why Java lost its mojo, and what Sun is doing about it]]></title>
-    <link href="http://www.toomuchcode.org/blog/2007/06/02/why-java-lost-its-mojo%2C-and-what-sun-is-doing-about-it/"/>
-    <updated>2007-06-02T13:36:30Z</updated>
-    <id>http://www.toomuchcode.org/blog/2007/06/02/why-java-lost-its-mojo,-and-what-sun-is-doing-about-it</id>
-    <content type="html"><![CDATA[<span style="font-weight: bold;"></span>It&#8217;s old news to some, and hotly debated by others, but Java has lost its mojo.  The Java community still has growth from large companies, but it hasn&#8217;t been the darling language of hackers for a while (if it ever was).  But don&#8217;t think Sun isn&#8217;t doing anything about it.<br /><br />Java&#8217;s popularity is a function of market position, the perception of one product compared to its competitors.  When it first came out, Java was positioned against C++, to which it compares favorably.  Yes, I miss operator overloading and a handful of other items, but these are outweighed by the fact that Java prevents entire classes of errors made by C++ developers.  All of this was done before, but Sun was able to make it mainstream and practicable.<br /><br />Now the Java vs. C++ battle is effectively over.  Today Java&#8217;s market position is measured against a variety of languages, most frequently C#, Python, and Ruby.  For many of us, Java compares much less favorably to these than to C++.  Proponents of these languages love to show problems solved in a handful of lines, with a Java-based solution including dozens of lines of boilerplate code.  The poor Java developer is then pushed around and has his lunch money stolen.<br /><br />Naturally, much of the Java community wants to do something about this.  So <a title="closures" href="http://www.javac.info/">closures</a> and <a title="type inference" href="http://weblogs.java.net/blog/forax/archive/2006/12/call_me_santa.html">type inference</a> have been proposed for Java 7, and the debate in the Java community begins.  Some say &#8220;Hooray, Python programmers will stop making fun of me!&#8221;  Others object &#8220;Don&#8217;t we already have enough constructs to worry about in this language?&#8221;  Throw in the glacier-like JCP, and we have no idea what the next release of Java will look like.<br /><br /><span style="font-weight: bold;">Can we fix Java?</span><br />I am sympathetic to both arguments.  The language <span style="font-style: italic;">is</span> getting big.  If only we could get rid of artifacts like primitive types and arrays, we could remove clutter and make conceptual room for more advanced concepts.  Even so, I still land firmly in the pro-closure camp.  This is partially for selfish reasons; I got hooked on them while hacking in functional languages at night, and want to use them in my day job.  My company uses Java because it is actually the right choice for us.  No other platform offers that combination of portability, reliability, tooling, and performance.  Too bad it&#8217;s not with a better language.<br /><br />With this in mind, the rumblings of the last few years make sense, and the future is clear.   It&#8217;s not about Java at all, it&#8217;s about the JVM.  And Sun is positioning the JVM to become a light, efficient virtual machine available everywhere.  Consider everything that has happened:<br /><ul><li><a title="JavaFX" href="http://java.sun.com/javafx/">JavaFX</a> has been announced, creating a simple, declarative model to compete with the likes of Flex.</li><li>Sun has committed to releasing an update to Java 6 that will shrink the minimal JRE download to two megabytes.</li><li>Sun hired <a title="Charles Nutter" href="http://headius.blogspot.com/">Charles Nutter</a> to make JRuby a first-class language for the JVM.  The 1.0 release nears.<br /></li><li>Glassifish &#8211; the open-source application server sponsored by Sun &#8211; will run JRuby applications directly in v3, and be pluggable for new hosts.  Java SE and EE need never enter the picture.</li><li>The JVM is now available under the GPL, which should increase availability on Linux.</li><li>The 2007 JavaOne conference included a <a title="Scala" href="http://www.scala-lang.org/">Scala</a> session for the first time</li></ul>What does this tell us?  The JRE is becoming the new POSIX.  And the Java language is becoming less and less relevant.  (Can&#8217;t find where I first saw this idea posted&#8230;please send link if you have it.)<br /><span style="font-weight: bold;"><br /><span style="font-weight: bold;">But what about the mean time?</span></span><br />The reality is Java-the-language will be around for some time to come, at least until a clear successor is established.  Sun and other members of the JCP have an opportunity to define the language&#8217;s legacy.  As Guy Steele famously said, Java &#8220;managed to drag a lot of them [C++ programmers] about halfway to Lisp.&#8221;  Now Java can drag programmers one step closer to Lisp, and set the stage for the next generation of languages.<br /><br />Of course, I&#8217;m referring to closures.  Users of functional languages will attest how working with such constructs changes how you think.  By adding closures to Java, we do more than provide a powerful tool for those of us already familiar with the construct.  We introduce a large community to a better way of solving many problems.  We&#8217;ll see if it sticks, but I can&#8217;t think of a better way to spread a thought model many believe to be superior.<br /><br /><span style="font-weight: bold;">Update:</span>  I actually don&#8217;t think Java sucks.  It meets the early goal as a straightforward replacement for C++ very well.  I do believe we can create a language that is better than Java based on what we&#8217;ve learned over the last decade.]]></content>
   </entry>
   
 </feed>

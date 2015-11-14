@@ -9,7 +9,7 @@
   <meta name="author" content="Ryan Brush">
 
   
-  <meta name="description" content="Anyone looking for information related to Clara should check out the new clara-rules.org site. Complete developer documentation and resources are &hellip;">
+  <meta name="description" content="Recently I&rsquo;ve focused on retaking rules for developers, where rules aim to be a developer-friendly way to untagle complex logic. Yet some &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -111,6 +111,461 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/11/14/insta-declarative-dsls/">Insta-Declarative DSLs!</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+        
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Recently I&rsquo;ve focused on <a href="https://www.youtube.com/watch?v=Z6oVuYmRgkk">retaking rules for developers</a>, where rules aim to be a developer-friendly way to untagle complex logic. Yet some problems call for policy changes without the involvement of developers. We need a simple way to write simple rules.</p>
+
+<p>One approach is to offer a minimal Domain-Specific Language focused on the policy our users need to change. In this post we take a simple example, write a DSL, parse it, validate it, and run it against some data. We&rsquo;ll use the excellent <a href="https://github.com/Engelberg/instaparse">Instaparse</a> library to define the grammar and create the parse tree, and convert that tree into rules executable with <a href="http://www.clara-rules.org">Clara</a>.</p>
+
+<p>First we figure out how we want our DSL to look. To keep things simple, let&rsquo;s imagine a retail setting and let our business user define promotions and discounts based on customer and order information. An example might look like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="nv">discount</span> <span class="nv">my-discount</span> <span class="mi">15</span> <span class="nb">when </span><span class="nv">customer</span> <span class="nv">status</span> <span class="nv">is</span> <span class="nv">platinum.</span>
+</span><span class='line'><span class="nv">discount</span> <span class="nv">extra-discount</span> <span class="mi">10</span> <span class="nb">when </span><span class="nv">customer</span> <span class="nv">status</span> <span class="nv">is</span> <span class="nv">gold</span> <span class="nb">and </span><span class="nv">total</span> <span class="nv">value</span> <span class="nb">&gt; </span><span class="mi">200</span><span class="nv">.</span>
+</span><span class='line'><span class="nv">promotion</span> <span class="nv">free-widget-month</span> <span class="nv">free-widget</span> <span class="nb">when </span><span class="nv">customer</span> <span class="nv">status</span> <span class="nv">is</span> <span class="nv">gold</span> <span class="nb">and </span><span class="nv">order</span> <span class="nv">month</span> <span class="nv">is</span> <span class="nv">august.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Rule engines are a good fit for declarative DSLs because rule engines <em>themselves</em> are declarative. We can see the rule-like structure in the above example: apply this policy when that set of conditions is true.</p>
+
+<p>Now we need to write a function that converts our friendly DSL into rules we can run. Fortunately, in Clara <a href="blog/2014/01/19/rules-as-data/">rules are data</a>, so our function needs to produce a simple data structure rather than generating rules using string manipulation. Using Clojure and <a href="https://github.com/Prismatic/schema">Prismatic Schema</a> to define the structure, our function looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">s/defn</span> <span class="nv">load-user-rules</span> <span class="ss">:-</span> <span class="p">[</span><span class="nv">clara.rules.schema/Production</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;Converts a business rule string into Clara productions.&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">business-rules</span> <span class="ss">:-</span> <span class="nv">s/Str</span><span class="p">]</span>
+</span><span class='line'>  <span class="c1">;; TODO: convert DSL to Clara rule structures.</span>
+</span><span class='line'>  <span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So let&rsquo;s implement it! First we use <a href="https://github.com/Engelberg/instaparse">Instaparse</a> to define our grammar. We can start with the major productions and break their contents. So the discount production would look like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="nv">DISCOUNT</span> <span class="nb">= </span><span class="nv">&lt;</span><span class="ss">&#39;discount&#39;&gt;</span> <span class="nv">NAME</span> <span class="nv">PERCENT</span> <span class="nv">&lt;</span><span class="ss">&#39;when&#39;&gt;</span> <span class="nv">CONDITION</span> <span class="p">[</span><span class="nv">&lt;</span><span class="ss">&#39;and&#39;&gt;</span> <span class="nv">CONDITION</span><span class="p">]</span><span class="nb">* </span><span class="nv">&lt;</span><span class="ss">&#39;.&#39;&gt;</span><span class="c1">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And it contains a series of conditions, like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="nv">CONDITION</span> <span class="nb">= </span><span class="nv">FACTTYPE</span> <span class="nv">FIELD</span> <span class="nv">OPERATOR</span> <span class="nv">VALUE</span> <span class="c1">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And so on. Here is the complete grammar we will use, which we simply bring into our Clojure session:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">require</span> <span class="o">&#39;</span><span class="p">[</span><span class="nv">instaparse.core</span> <span class="ss">:as</span> <span class="nv">insta</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">shopping-grammar</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">insta/parser</span>
+</span><span class='line'>   <span class="s">&quot;&lt;RULES&gt; = [DISCOUNT | PROMOTION]+</span>
+</span><span class='line'><span class="s">    PROMOTION = &lt;&#39;promotion&#39;&gt; NAME PROMOTIONTYPE &lt;&#39;when&#39;&gt; CONDITION [&lt;&#39;and&#39;&gt; CONDITION]* &lt;&#39;.&#39;&gt;;</span>
+</span><span class='line'><span class="s">    DISCOUNT = &lt;&#39;discount&#39;&gt; NAME PERCENT &lt;&#39;when&#39;&gt; CONDITION [&lt;&#39;and&#39;&gt; CONDITION]* &lt;&#39;.&#39;&gt;;</span>
+</span><span class='line'><span class="s">    &lt;PERCENT&gt; = NUMBER ;</span>
+</span><span class='line'><span class="s">    PROMOTIONTYPE = STRING ;</span>
+</span><span class='line'><span class="s">    &lt;NAME&gt; = STRING ;</span>
+</span><span class='line'><span class="s">    NUMBER = #&#39;[0-9]+&#39; ;</span>
+</span><span class='line'><span class="s">    &lt;STRING&gt; = #&#39;[A-Za-z][A-Za-z0-9_-]+&#39; ;</span>
+</span><span class='line'><span class="s">    CONDITION = FACTTYPE FIELD OPERATOR VALUE ;</span>
+</span><span class='line'><span class="s">    FACTTYPE = &#39;customer&#39; | &#39;total&#39; | &#39;order&#39; ;</span>
+</span><span class='line'><span class="s">    &lt;FIELD&gt; = STRING ;</span>
+</span><span class='line'><span class="s">    OPERATOR = &#39;is&#39; | &#39;&gt;&#39; | &#39;&lt;&#39; | &#39;=&#39; ;</span>
+</span><span class='line'><span class="s">    &lt;VALUE&gt; = STRING | NUMBER ;</span>
+</span><span class='line'><span class="s">    &quot;</span>
+</span><span class='line'>   <span class="ss">:auto-whitespace</span> <span class="ss">:standard</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>The of angle brackets indicate productions to omit from the abstract syntax tree and replace by their children. This isn&rsquo;t strictly necessary, but simplifies things when transform the tree.</p>
+
+<p>The <code>insta-parser</code> function actually returns a function that converts an input to the syntax tree! So we can just call it with our DSL and pretty-print the results:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">clojure.pprint/pprint</span>
+</span><span class='line'> <span class="p">(</span><span class="nf">shopping-grammar</span>
+</span><span class='line'>  <span class="s">&quot;discount my-discount 15 when customer status is platinum.</span>
+</span><span class='line'><span class="s">   discount extra-discount 10 when customer status is gold and total value &gt; 200.</span>
+</span><span class='line'><span class="s">   promotion free-widget-month free-widget when customer status is gold and order month is august.&quot;</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Which produces this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">([</span><span class="ss">:DISCOUNT</span>
+</span><span class='line'>  <span class="s">&quot;my-discount&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:NUMBER</span> <span class="s">&quot;15&quot;</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;customer&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="s">&quot;status&quot;</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;is&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="s">&quot;platinum&quot;</span><span class="p">]]</span>
+</span><span class='line'> <span class="p">[</span><span class="ss">:DISCOUNT</span>
+</span><span class='line'>  <span class="s">&quot;extra-discount&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:NUMBER</span> <span class="s">&quot;10&quot;</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span> <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;customer&quot;</span><span class="p">]</span> <span class="s">&quot;status&quot;</span> <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;is&quot;</span><span class="p">]</span> <span class="s">&quot;gold&quot;</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;total&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="s">&quot;value&quot;</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;&gt;&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:NUMBER</span> <span class="s">&quot;200&quot;</span><span class="p">]]]</span>
+</span><span class='line'> <span class="p">[</span><span class="ss">:PROMOTION</span>
+</span><span class='line'>  <span class="s">&quot;free-widget-month&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:PROMOTIONTYPE</span> <span class="s">&quot;free-widget&quot;</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span> <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;customer&quot;</span><span class="p">]</span> <span class="s">&quot;status&quot;</span> <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;is&quot;</span><span class="p">]</span> <span class="s">&quot;gold&quot;</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span> <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;order&quot;</span><span class="p">]</span> <span class="s">&quot;month&quot;</span> <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;is&quot;</span><span class="p">]</span> <span class="s">&quot;august&quot;</span><span class="p">]])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Just for fun, let&rsquo;s see what happens when a user mistypes some input. Let&rsquo;s say &ldquo;customer&rdquo; is misspelled when we evaluate the input against our grammar. So running this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">println</span>
+</span><span class='line'> <span class="p">(</span><span class="nf">shopping-grammar</span>
+</span><span class='line'>  <span class="s">&quot;discount my-discount 15 when customeer status is platinum.&quot;</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>prints out this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="nv">Parse</span> <span class="nv">error</span> <span class="nv">at</span> <span class="nv">line</span> <span class="mi">1</span>, <span class="nv">column</span> <span class="mi">30</span><span class="err">:</span>
+</span><span class='line'><span class="nv">discount</span> <span class="nv">my-discount</span> <span class="mi">15</span> <span class="nb">when </span><span class="nv">customeer</span> <span class="nv">status</span> <span class="nv">is</span> <span class="nv">platinum.</span>
+</span><span class='line'>                             <span class="o">^</span>
+</span><span class='line'><span class="nv">Expected</span> <span class="nv">one</span> <span class="nv">of</span><span class="err">:</span>
+</span><span class='line'><span class="nv">order</span>
+</span><span class='line'><span class="nv">total</span>
+</span><span class='line'><span class="nv">customer</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Great! The error is pretty clear and gives the user options how to fix it. Instaparse does a great job at this.</p>
+
+<p>Alright, let&rsquo;s get back on track and imagine our user fixed the error. We now have a nice parse tree&hellip;we just need to convert it into rules. One way to do this is write a <code>map</code> function that goes through each top-level production and returns a Clara rule. This is a fine approach, and may be a better fit depending on the transformation needed. But in this case I&rsquo;m going to take advantage of another feature of Instaparse: the ability to apply arbitrary transformations to productions in the tree.</p>
+
+<p>The simplest example is we want to replace productions like [:NUMBER &ldquo;15&rdquo;] with&hellip;the actual number 15. This tends to be useful for things like, you know, math.</p>
+
+<p>So let&rsquo;s run a production through our grammar and use the <code>insta/transform</code> function to take a map of transformation for productions. We use Clojure&rsquo;s threading macro to make wiring functions together more readable:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">-&gt;&gt;</span> <span class="s">&quot;discount my-discount 15 when customer status is platinum.&quot;</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">shopping-grammar</span><span class="p">)</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">insta/transform</span> <span class="p">{</span><span class="ss">:NUMBER</span> <span class="o">#</span><span class="p">(</span><span class="nf">Integer/parseInt</span> <span class="nv">%</span><span class="p">)})</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">clojure.pprint/pprint</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This transforms our tree into this, where we have a number rather than an AST production:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">([</span><span class="ss">:DISCOUNT</span>
+</span><span class='line'>  <span class="s">&quot;my-discount&quot;</span>
+</span><span class='line'>  <span class="mi">15</span>
+</span><span class='line'>  <span class="p">[</span><span class="ss">:CONDITION</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:FACTTYPE</span> <span class="s">&quot;customer&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="s">&quot;status&quot;</span>
+</span><span class='line'>   <span class="p">[</span><span class="ss">:OPERATOR</span> <span class="s">&quot;is&quot;</span><span class="p">]</span>
+</span><span class='line'>   <span class="s">&quot;platinum&quot;</span><span class="p">]])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>So we&rsquo;ve taken our first step of transforming our tree into an actual, executable rule! Now we need to do some more transformations:</p>
+
+<ul>
+<li><code>:OPERATOR</code> gets transformed to a Clojure comparison function</li>
+<li><code>:FACTTYPE</code> gets transformed to a Clojure type. In this case we just use Clojure records.</li>
+<li><code>:PROMOTIONTYPE</code> is an enumeration, which we idiomatically transform to a Clojure keyword</li>
+<li><code>:CONDITION</code> gets transformed into the left-hand side expression of a rule</li>
+<li><code>:DISCOUNT</code> and <code>:PRODUCTION</code> get transformed into actual Clara rules, built on the transformations above! These match the <code>clara.rules.schema/Production</code> Prismatic Schema.</li>
+</ul>
+
+
+<p>I find it&rsquo;s best to build this type of logic from the bottom up in a REPL or a REPL-connected editor. Just start with the simplest transformations, like <code>:NUMBER</code> and <code>:OPERATOR</code>, make sure they work in the REPL, then work on the transformations that use them. I also found myself tweaking the grammar to omit or hide unnecessary productions. After a few quick iterations I ended up with this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">operators</span> <span class="p">{</span><span class="s">&quot;is&quot;</span> <span class="o">`</span><span class="nv">=</span>
+</span><span class='line'>                <span class="s">&quot;&gt;&quot;</span> <span class="o">`</span><span class="nv">&gt;</span>
+</span><span class='line'>                <span class="s">&quot;&lt;&quot;</span> <span class="o">`</span><span class="nv">&lt;</span>
+</span><span class='line'>                <span class="s">&quot;=&quot;</span> <span class="o">`</span><span class="nv">=</span><span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">fact-types</span>
+</span><span class='line'>  <span class="p">{</span><span class="s">&quot;customer&quot;</span> <span class="nv">Customer</span>
+</span><span class='line'>   <span class="s">&quot;total&quot;</span> <span class="nv">Total</span>
+</span><span class='line'>   <span class="s">&quot;order&quot;</span> <span class="nv">Order</span><span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">shopping-transforms</span>
+</span><span class='line'>  <span class="p">{</span><span class="ss">:NUMBER</span> <span class="o">#</span><span class="p">(</span><span class="nf">Integer/parseInt</span> <span class="nv">%</span><span class="p">)</span>
+</span><span class='line'>   <span class="ss">:OPERATOR</span> <span class="nv">operators</span>
+</span><span class='line'>   <span class="ss">:FACTTYPE</span> <span class="nv">fact-types</span>
+</span><span class='line'>   <span class="ss">:CONDITION</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">fact-type</span> <span class="nv">field</span> <span class="nv">operator</span> <span class="nv">value</span><span class="p">]</span>
+</span><span class='line'>                <span class="p">{</span><span class="ss">:type</span> <span class="nv">fact-type</span>
+</span><span class='line'>                 <span class="ss">:constraints</span> <span class="p">[(</span><span class="nb">list </span><span class="nv">operator</span> <span class="p">(</span><span class="nb">symbol </span><span class="nv">field</span><span class="p">)</span> <span class="nv">value</span><span class="p">)]})</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c1">;; Convert promotion strings to keywords.</span>
+</span><span class='line'>   <span class="ss">:PROMOTIONTYPE</span> <span class="nv">keyword</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="ss">:DISCOUNT</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nb">name </span><span class="nv">percent</span> <span class="o">&amp;</span> <span class="nv">conditions</span><span class="p">]</span>
+</span><span class='line'>               <span class="p">{</span><span class="ss">:name</span> <span class="nv">name</span>
+</span><span class='line'>                <span class="ss">:lhs</span> <span class="nv">conditions</span>
+</span><span class='line'>                <span class="ss">:rhs</span> <span class="o">`</span><span class="p">(</span><span class="nf">insert!</span> <span class="p">(</span><span class="nf">-&gt;Discount</span> <span class="o">~</span><span class="nb">name </span><span class="o">~</span><span class="nv">percent</span><span class="p">))})</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="ss">:PROMOTION</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nb">name </span><span class="nv">promotion-type</span> <span class="o">&amp;</span> <span class="nv">conditions</span><span class="p">]</span>
+</span><span class='line'>                <span class="p">{</span><span class="ss">:name</span> <span class="nv">name</span>
+</span><span class='line'>                 <span class="ss">:lhs</span> <span class="nv">conditions</span>
+</span><span class='line'>                 <span class="ss">:rhs</span> <span class="o">`</span><span class="p">(</span><span class="nf">insert!</span> <span class="p">(</span><span class="nf">-&gt;Promotion</span> <span class="o">~</span><span class="nb">name </span><span class="o">~</span><span class="nv">promotion-type</span><span class="p">))})})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s it! This works because the transformations build on top of lower-level transformations. For instance, the <code>:CONDITION</code> transformation is given a fact-type and an operator because those were transformed by the <code>:FACTTYPE</code> and <code>:OPERATOR</code> transformations, respectively. Users could choose to leave out lower-level transformations and have <code>:CONDITION</code> do all of the work, but the above approach shows the power of this Instaparse feature.</p>
+
+<p>Also note our use of the Clojure syntax quote (`) and unquote (~). These are typically used when writing Macros, but they&rsquo;re convenient in this case to build expressions that Clara turns into rules. (After all, Clara is really just a big macro that converts user expressions into a rete network!)</p>
+
+<p>Now let&rsquo;s run this set of transformations against our input data:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="nf">-&gt;&gt;</span> <span class="s">&quot;discount my-discount 15 when customer status is platinum.</span>
+</span><span class='line'><span class="s">      discount extra-discount 10 when customer status is gold and total value &gt; 200.</span>
+</span><span class='line'><span class="s">      promotion free-widget-month free-widget when customer status is gold and order month is august.&quot;</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">shopping-grammar</span><span class="p">)</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">insta/transform</span> <span class="nv">shopping-transforms</span><span class="p">)</span>
+</span><span class='line'>     <span class="p">(</span><span class="nf">clojure.pprint/pprint</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This produces:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">({</span><span class="ss">:name</span> <span class="s">&quot;my-discount&quot;</span>,
+</span><span class='line'>  <span class="ss">:lhs</span>
+</span><span class='line'>  <span class="p">({</span><span class="ss">:type</span> <span class="nv">clara.examples.insta.Customer</span>,
+</span><span class='line'>    <span class="ss">:constraints</span> <span class="p">[(</span><span class="nf">clojure.core/=</span> <span class="nv">status</span> <span class="s">&quot;platinum&quot;</span><span class="p">)]})</span>,
+</span><span class='line'>  <span class="ss">:rhs</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">clara.rules/insert!</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">clara.examples.insta/-&gt;Discount</span> <span class="s">&quot;my-discount&quot;</span> <span class="mi">15</span><span class="p">))}</span>
+</span><span class='line'> <span class="p">{</span><span class="ss">:name</span> <span class="s">&quot;extra-discount&quot;</span>,
+</span><span class='line'>  <span class="ss">:lhs</span>
+</span><span class='line'>  <span class="p">({</span><span class="ss">:type</span> <span class="nv">clara.examples.insta.Customer</span>,
+</span><span class='line'>    <span class="ss">:constraints</span> <span class="p">[(</span><span class="nf">clojure.core/=</span> <span class="nv">status</span> <span class="s">&quot;gold&quot;</span><span class="p">)]}</span>
+</span><span class='line'>   <span class="p">{</span><span class="ss">:type</span> <span class="nv">clara.examples.insta.Total</span>,
+</span><span class='line'>    <span class="ss">:constraints</span> <span class="p">[(</span><span class="nf">clojure.core/&gt;</span> <span class="nv">value</span> <span class="mi">200</span><span class="p">)]})</span>,
+</span><span class='line'>  <span class="ss">:rhs</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">clara.rules/insert!</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">clara.examples.insta/-&gt;Discount</span> <span class="s">&quot;extra-discount&quot;</span> <span class="mi">10</span><span class="p">))}</span>
+</span><span class='line'> <span class="p">{</span><span class="ss">:name</span> <span class="s">&quot;free-widget-month&quot;</span>,
+</span><span class='line'>  <span class="ss">:lhs</span>
+</span><span class='line'>  <span class="p">({</span><span class="ss">:type</span> <span class="nv">clara.examples.insta.Customer</span>,
+</span><span class='line'>    <span class="ss">:constraints</span> <span class="p">[(</span><span class="nf">clojure.core/=</span> <span class="nv">status</span> <span class="s">&quot;gold&quot;</span><span class="p">)]}</span>
+</span><span class='line'>   <span class="p">{</span><span class="ss">:type</span> <span class="nv">clara.examples.insta.Order</span>,
+</span><span class='line'>    <span class="ss">:constraints</span> <span class="p">[(</span><span class="nf">clojure.core/=</span> <span class="nv">month</span> <span class="s">&quot;august&quot;</span><span class="p">)]})</span>,
+</span><span class='line'>  <span class="ss">:rhs</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">clara.rules/insert!</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">clara.examples.insta/-&gt;Promotion</span>
+</span><span class='line'>    <span class="s">&quot;free-widget-month&quot;</span>
+</span><span class='line'>    <span class="ss">:free-widget</span><span class="p">))})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Now we have a sequence of rules we can run! We can pass this directly into the <a href="http://www.clara-rules.org/apidocs/0.9.0/clojure/clara.rules.html#var-mk-session">mk-session</a> function and create an actual rule session!</p>
+
+<p>We can also combine these rules with others written by Clara&rsquo;s <a href="http://www.clara-rules.org/apidocs/0.9.0/clojure/clara.rules.html#var-defrule">defrule</a> or generated from some other source. You can see the full code in the <a href="https://github.com/rbrush/clara-examples/blob/master/src/main/clojure/clara/examples/insta.clj">clara.examples.insta</a> namespace in the clara-examples project, but here is the pertinent segment for running our rules:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">session</span> <span class="p">(</span><span class="nb">-&gt; </span><span class="p">(</span><span class="nf">mk-session</span> <span class="ss">&#39;clara.examples.insta</span> <span class="p">(</span><span class="nf">load-user-rules</span> <span class="nv">example-rules</span><span class="p">))</span>
+</span><span class='line'>                  <span class="p">(</span><span class="nf">insert</span> <span class="p">(</span><span class="nf">-&gt;Customer</span> <span class="s">&quot;gold&quot;</span><span class="p">)</span>
+</span><span class='line'>                          <span class="p">(</span><span class="nf">-&gt;Order</span> <span class="mi">2013</span> <span class="s">&quot;august&quot;</span> <span class="mi">20</span><span class="p">)</span>
+</span><span class='line'>                          <span class="p">(</span><span class="nf">-&gt;Purchase</span> <span class="mi">20</span> <span class="ss">:gizmo</span><span class="p">)</span>
+</span><span class='line'>                          <span class="p">(</span><span class="nf">-&gt;Purchase</span> <span class="mi">120</span> <span class="ss">:widget</span><span class="p">)</span>
+</span><span class='line'>                          <span class="p">(</span><span class="nf">-&gt;Purchase</span> <span class="mi">90</span> <span class="ss">:widget</span><span class="p">))</span>
+</span><span class='line'>                  <span class="p">(</span><span class="nf">fire-rules</span><span class="p">))]</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">(</span><span class="nf">clojure.pprint/pprint</span> <span class="p">(</span><span class="nf">query</span> <span class="nv">session</span> <span class="nv">get-discounts</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">clojure.pprint/pprint</span> <span class="p">(</span><span class="nf">query</span> <span class="nv">session</span> <span class="nv">get-promotions</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Running this produces the following output:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='clj'><span class='line'><span class="p">({</span><span class="ss">:?discount</span> <span class="p">{</span><span class="ss">:name</span> <span class="s">&quot;extra-discount&quot;</span>, <span class="ss">:percent</span> <span class="mi">10</span><span class="p">}})</span>
+</span><span class='line'><span class="p">({</span><span class="ss">:?discount</span> <span class="p">{</span><span class="ss">:reason</span> <span class="s">&quot;free-widget-month&quot;</span>, <span class="ss">:type</span> <span class="ss">:free-widget</span><span class="p">}})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And that&rsquo;s it! The complete code for this is in <a href="https://github.com/rbrush/clara-examples/blob/master/src/main/clojure/clara/examples/insta.clj">clara-examples</a>. Details on Instaparse can be found on the <a href="https://github.com/Engelberg/instaparse">Instaparse github page</a> and Clara documentation is at <a href="http://www.clara-rules.org">clara-rules.org</a>.</p>
+
+<p>Finally, we once again see how powerful Clojure&rsquo;s composable design is. The Instaparse and Clara libraries were built completely independently, but since both use functional transformations of immutable data structures we were able to combine them to create something useful in a small amount of code. Plus hacking on this stuff is just plain <em>fun</em>.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -733,35 +1188,6 @@ The resulting query returns the matching promotions. More sophisticated examples
 
 
   <div class="entry-content"><div style="margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; background-color: transparent; font-family: Times; font-size: medium; "><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Nothing in human history has offered more promise but has seen as many failures as software.  We’ve all seen moments of greatness, where a program seems like magic &#8211; but such gems are surrounded by minefields of bugs and indecipherable interfaces.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">The result of all this is we programmers are often a frustrated bunch. But should we be? After all, what makes us think that as a species we should have the aptitude to create great software?  Our skill sets evolved in an environment that favored those who could hunt boar and find berries &#8211; any capacity to succeed in the abstract world of software is pure, accidental side effect.  Perhaps we should be awed by software’s successes rather than frustrated by its failures.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">The good news is we can improve despite our limitations, and it starts with this: accept that we generally have no innate ability to create great systems, and design our practices around that.  It seems like </span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">every</span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "> major step forward in software has followed this pattern of embracing our limitations.  For instance, we move to iterative development since we can’t anticipate all variables of a project.  We aggressively unit test because we realize we’re prone to error. Libraries derived from practical experience frequently replace those built by expert groups.   The list goes on.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">This type of admission is humbling, but it can also be liberating.  Here’s an example: In years past I would spend hours agonizing over an internal design decision for a system I was building.  I figured if I got it right we could easily bolt on some new feature.  Sometimes I was right, but often times I was not.  My code often was littered with unnecessary structure that only made things more complicated.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Contrast that to today:  I know I can’t anticipate future needs in most cases, so I just apply this simple heuristic: </span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><ol><li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; "><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">When in doubt, do the simplest thing possible to solve the problem at hand</span></li><li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; "><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Plan on refactoring later.</span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "> </span></li></ol><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">The first step frees us from trying to anticipate all future needs &#8211; but this is not quick and dirty cowboy coding.  An essential element of code is to create an understandable and maintainable system.  Don&#8217;t try to code for future needs.  Instead, structure code for present needs so it can be leveraged in the future.  </span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">So how do we do this? A couple things to keep in mind:</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><ul><li style="list-style-type: disc; font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; "><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">When in doubt, leave it out. (also known as “You Ain’t Gonna Need It”)</span></li><li style="list-style-type: disc; font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; "><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Unit-Testable designs tend to be reusable designs.  Unit tests not only catch bugs that can result from refactoring, but they encourage modularity to enable that refactoring.</span></li><li style="list-style-type: disc; font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; "><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Don’t try to design an API independently of an application.  You won’t understand your users’ needs well enough to create a good experience.   Build the API as part of the application to make sure its needs are met, then factor out and generalize.</span></li><li style="list-style-type: disc; font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; "><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Group code together that tends to change for similar reasons.  If your Widget class is responsible for rendering its UI </span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">and</span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "> writing to the database </span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">and</span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "> business logic, you can’t use it anywhere else without significant changes.  High cohesion and loose coupling.</span></li></ul><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">There are no hard-and-fast rules to building software, but we all need a compass to help guide us through the thousands of micro-decisions we make every time we write code.  Hopefully this post can help build that compass.</span></div></div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2010/10/19/can-agile-in-the-large-succeed/">Can &#8220;Agile in the Large&#8221; Succeed?</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-        
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><div    style="margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; background-   font-family:Times;font-size:medium;color:transparent;"><span class="Apple-style-span"  style="font-family:Arial;"><span class="Apple-style-span" style="white-space: pre-wrap; font-size: -webkit-xxx-large;"><div style="margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; background-color: transparent; font-family: Times; white-space: normal; font-size: medium; "><span id="internal-source-marker_0.45896949572488666" style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Agile Development isn’t perfect, but it got something right.  Right enough, at least, to gain enough momentum to become a buzzword &#8211; and for consultants to latch on by selling “Agile” to big enterprises.  The result is “Agile in the Large”.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Agile in the Large ranges from the </span><a href="http://www.halfarsedagilemanifesto.org/"><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 153); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: underline; vertical-align: baseline; white-space: pre-wrap; ">Half-Arsed Agile Manifesto</span></a><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "> to </span><a href="http://en.wikipedia.org/wiki/Cargo_cult"><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 153); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: underline; vertical-align: baseline; white-space: pre-wrap; ">Cargo Cult</span></a><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "> practices.  Too often we simply bolt on a few agile practices without understanding how they provide value.  Adding scrums and iteration reviews to your current process and expecting improvement is like building a runway in your back yard and expecting planes to land.  </span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Whether it’s labelled agile or not, a cohesive development team works for a couple reasons.  It creates a focused team fully aligned to a common goal. It avoids “Us and Them” mentalities, enabling everyone to adapt to meet the goal. It offers a self-correcting strategy for the thousands of micro-decisions when building software:  It must be testable, “You Ain’t Gonna Need It”, and it creates quick feedback to make sure you’re solving the actual problem.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Agile in the Large is flawed because it often fails to achieve these basic ingredients.  Take Scrum of Scrums, for example.  It tries to coordinate and resolve technical dependencies between teams by having representatives from each team get together and talk through them.  It’s better than nothing, but an emerging system has too much ambiguity: the interaction between components is still being defined, bugs can lead to finger pointing, and the important sense of ownership is lost.  Everyone feels like cogs in a machine rather than someone solving an important problem for a real user.  Our ability to adapt the microdecisions that build great software is lost.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">In fact, Agile in the Large seems doomed from the beginning. Once you’re beyond some number of people in a single project, it’s impossible to create that sense of shared ownership and adaptability.  Great software is created by small, dedicated teams.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">So, what then? It seems the only way out is to make Agile in the Large more like Agile in the Small.  A team should be working on one and only one project, and include everything necessary for that project to be successful.  How we do that depends on where we are in a project’s maturity curve.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: bold; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">New vs. mature systems</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">New development is the most easily handled.  Look at the problems at hand, and make sure the team is equipped to handle them end-to-end.  This new project may have several components, but </span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">now is not the time to split those components into their own teams;</span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "> keep a single team aligned to the user’s goals.  After all, if a component isn’t aligned to some user’s goal, what is its value?  Organize around components too early, and team cohesion is lost.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">So we are off to a good start, but we need to adjust our strategy as a successful project matures.  You may find parts of your system has value for other uses.  This seems timeless: C first was a successful tool for building Unix, Ruby on Rails was an application before it was a framework, Amazon was an online book store before it was a cloud platform, and so on.  In all of these cases a successful system was built, and then groups arise around the reusable pieces.  Reusable technology will naturally arise from a successful project.  Embrace that, but don’t force it.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: bold; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Open source as a model for reuse</span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Later in a system’s life we find ourselves consuming many assets from a variety of teams. Now it’s easy to let coordination and communication friction kill our focused project.  Fortunately, the open source world gives us the answer.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Quite simply, needed enhancements to common assets should be written and contributed by consuming teams.  This offers several advantages over logging an enhancement request.  For instance, we reduce deadline haggling and misaligned schedules.  We also reduce the need for frequent status updates and opportunities for miscommunication between teams.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Of course, not all changes to open source projects come in the form of patches.  There should still be a team around the asset in question, responsible for its architecture and fundamental direction.  That team also operates as a gatekeeper, ensuring all patches are properly unit tested, documented, and don’t threaten the integrity of the system.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Changes must be handled on a case-by-case basis, but the primary mode of operation should follow the agile ideal: a single team with responsibility for a project end-to-end.  This includes contributing to assets it consumes.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: bold; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">What if even the initial project is too big?</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">I’ll touch on one final question: what if even the initial scope of a project is beyond what a single team can accomplish?  Find a smaller initial scope, get it working, and grow from there.  Do this even if the initial scope means building placeholders that are discarded in the final result.  The time saved and friction eliminated by creating a single, focused team will outweigh this.  Think of it as scaffolding that eventually gets removed.</span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; "></span><br /><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">In the end, </span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: italic; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">Agile in the Large only works if we make it more like Agile in the Small.</span><span style="font-size: 11pt; font-family: Arial; color: rgb(0, 0, 0); background-color: transparent; font-weight: normal; font-style: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap; ">  Hopefully this article is a step in that direction.</span></div></span></span></div></div>
   
   
 
