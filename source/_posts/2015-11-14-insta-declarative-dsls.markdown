@@ -267,6 +267,8 @@ Running this produces the following output:
 ({:?discount {:reason "free-widget-month", :type :free-widget}})
 ```
 
-And that's it! The complete code for this is in [clara-examples](https://github.com/rbrush/clara-examples/blob/master/src/main/clojure/clara/examples/insta.clj). Details on Instaparse can be found on the [Instaparse github page](https://github.com/Engelberg/instaparse) and Clara documentation is at [clara-rules.org](http://www.clara-rules.org).
+And that's it! The complete code for this is in [clara-examples](https://github.com/rbrush/clara-examples/blob/master/src/main/clojure/clara/examples/insta.clj). Details on Instaparse can be found on the [Instaparse github page](https://github.com/Engelberg/instaparse) and Clara documentation is at [clara-rules.org](http://www.clara-rules.org). You can also reach me on twitter [@ryanbrush](https://twitter.com/ryanbrush).
 
 Finally, we once again see how powerful Clojure's composable design is. The Instaparse and Clara libraries were built completely independently, but since both use functional transformations of immutable data structures we were able to combine them to create something useful in a small amount of code. Plus hacking on this stuff is just plain *fun*.
+
+UPDATE: I posted an answer to a follow up question to [this thread in the Clara Google group](https://groups.google.com/forum/#!topic/clara-rules/ME7CKVdBMqg). If there are other topics, please feel free to use that thread or create a new one.
