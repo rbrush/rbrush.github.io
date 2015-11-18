@@ -151,7 +151,7 @@
 
 <p>Rule engines are a good fit for declarative DSLs because rule engines <em>themselves</em> are declarative. We can see the rule-like structure in the above example: apply this policy when that set of conditions is true.</p>
 
-<p>Now we need to write a function that converts our friendly DSL into rules we can run. Fortunately, in Clara <a href="blog/2014/01/19/rules-as-data/">rules are data</a>, so our function needs to produce a simple data structure rather than generating rules using string manipulation. Using Clojure and <a href="https://github.com/Prismatic/schema">Prismatic Schema</a> to define the structure, our function looks like this:</p>
+<p>Now we need to write a function that converts our friendly DSL into rules we can run. Fortunately, in Clara <a href="/blog/2014/01/19/rules-as-data/">rules are data</a>, so our function needs to produce a simple data structure rather than generating rules using string manipulation. Using Clojure and <a href="https://github.com/Prismatic/schema">Prismatic Schema</a> to define the structure, our function looks like this:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
