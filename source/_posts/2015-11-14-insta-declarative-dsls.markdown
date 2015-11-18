@@ -20,7 +20,7 @@ promotion free-widget-month free-widget when customer status is gold and order m
 
 Rule engines are a good fit for declarative DSLs because rule engines *themselves* are declarative. We can see the rule-like structure in the above example: apply this policy when that set of conditions is true.
 
-Now we need to write a function that converts our friendly DSL into rules we can run. Fortunately, in Clara [rules are data](blog/2014/01/19/rules-as-data/), so our function needs to produce a simple data structure rather than generating rules using string manipulation. Using Clojure and [Prismatic Schema](https://github.com/Prismatic/schema) to define the structure, our function looks like this:
+Now we need to write a function that converts our friendly DSL into rules we can run. Fortunately, in Clara [rules are data](/blog/2014/01/19/rules-as-data/), so our function needs to produce a simple data structure rather than generating rules using string manipulation. Using Clojure and [Prismatic Schema](https://github.com/Prismatic/schema) to define the structure, our function looks like this:
 
 ```clj
 (s/defn load-user-rules :- [clara.rules.schema/Production]
