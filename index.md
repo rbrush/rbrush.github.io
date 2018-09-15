@@ -6,6 +6,7 @@ layout: default
 title: Ryan Brush
 exclude: true
 ---
+
 # Ryan Brush
 Vice President and Chief Engineer at [Cerner](https://engineering.cerner.com/) and author of [Clara Rules](https://www.clara-rules.org) and [Bunsen](https://engineering.cerner.com/bunsen/). Currently focused on large-scale data engineering and analysis in healthcare.
 
