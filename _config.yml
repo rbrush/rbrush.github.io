@@ -34,6 +34,9 @@ theme: minima # minimal-mistakes-jekyll
 plugins:
   - jekyll-feed
 
+header_pages:
+  - blog.html
+
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
 # to override the default setting.
