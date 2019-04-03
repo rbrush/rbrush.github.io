@@ -8,7 +8,7 @@ exclude: true
 ---
 
 # Ryan Brush
-Data engineering at [KenSci](https://www.kensci.com/) and author of [Clara Rules](https://www.clara-rules.org) and [Bunsen](https://engineering.cerner.com/bunsen/). Formerly with [Cerner](https://www.cerner.com/).
+Software Engineer at Google and author of [Clara Rules](https://www.clara-rules.org) and [Bunsen](https://engineering.cerner.com/bunsen/). Formerly with [KenSci](https://www.kensci.com/) and [Cerner](https://www.cerner.com/).
 
 [GitHub](https://github.com/rbrush)  [LinkedIn](https://www.linkedin.com/in/ryanabrush/)  [Twitter](https://twitter.com/ryanbrush)
 
