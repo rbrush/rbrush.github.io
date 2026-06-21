@@ -1,0 +1,21 @@
+{
+  "webcredentials": {
+    "apps": [
+      "YOUR_APPLE_TEAM_ID_HERE.org.toomuchcode.swathe.Swathe"
+    ]
+  },
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": [
+          "YOUR_APPLE_TEAM_ID_HERE.org.toomuchcode.swathe.Swathe"
+        ],
+        "paths": [
+          "/swathe",
+          "/swathe/*"
+        ]
+      }
+    ]
+  }
+}

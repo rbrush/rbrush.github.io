@@ -1,3 +1,10 @@
-# Local Viewer for Medical records
-Swathe is an on-device viewer and local AI for medical records. It keeps everything locally unless you explicitly connect it to the external AI agent of your choice.
+---
+layout: default
+permalink: /swathe/
+---
 
+# Swathe
+
+Swathe is a local viewer for clinical medical records (using SMART on FHIR) and a local AI assistant.
+
+This URL handles the secure HTTPS redirect callback for the Swathe application. If you have the Swathe app installed, it should automatically intercept this callback to complete authorization.

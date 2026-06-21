@@ -34,6 +34,9 @@ theme: minima # minimal-mistakes-jekyll
 plugins:
   - jekyll-feed
 
+include:
+  - .well-known
+
 header_pages:
   - blog.html
 
