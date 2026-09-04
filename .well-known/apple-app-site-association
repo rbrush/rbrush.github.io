@@ -1,7 +1,7 @@
 {
   "webcredentials": {
     "apps": [
-      "YOUR_APPLE_TEAM_ID_HERE.org.toomuchcode.swathe.Swathe"
+      "YOUR_APPLE_TEAM_ID_HERE.org.toomuchcode.conduit.Conduit"
     ]
   },
   "applinks": {
@@ -9,11 +9,11 @@
     "details": [
       {
         "appIDs": [
-          "YOUR_APPLE_TEAM_ID_HERE.org.toomuchcode.swathe.Swathe"
+          "YOUR_APPLE_TEAM_ID_HERE.org.toomuchcode.conduit.Conduit"
         ],
         "paths": [
-          "/swathe",
-          "/swathe/*"
+          "/conduit",
+          "/conduit/*"
         ]
       }
     ]

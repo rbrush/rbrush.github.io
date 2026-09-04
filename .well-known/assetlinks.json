@@ -3,7 +3,7 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "org.toomuchcode.swathe",
+      "package_name": "org.toomuchcode.conduit",
       "sha256_cert_fingerprints": [
         "9F:58:FA:B4:93:EB:D9:B3:8B:52:52:8D:77:5E:29:17:C5:81:45:49:45:2B:B7:6F:40:07:04:97:8F:D5:DC:F0"
       ]
